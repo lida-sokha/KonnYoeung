@@ -1,14 +1,17 @@
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from '../src/components/Layout/Navbar';
+import Footer from '../src/components/Layout/Footer';
 function App() {
 
   return (
-    <>
-      <h1 className="text-3xl font-bold text-red-600">
-  Tailwind v4 is working
-</h1>
-
-    </>
-  )
+    <Router>
+      <Navbar /> {/* This stays on top of every page */}
+      <Routes>
+        {/* Add your other routes here */}
+      </Routes>
+      <Footer />
+    </Router>
+  );
 }
 
 export default App

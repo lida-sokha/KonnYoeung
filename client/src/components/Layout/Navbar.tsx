@@ -3,24 +3,24 @@ import { Link } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   return (
-    <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b">
+    <nav className="flex items-center justify-between px-8 py-4 bg-white ">
       {/* Left side: Logo */}
       <div className="flex items-center gap-2">
         <img 
-          src="/logo.png" // Make sure your logo is in public/logo.png
+          src="../public/images/logo.png" 
           alt="KonnYoeung Logo" 
           className="h-10 w-auto" 
         />
-        <span className="text-xl font-bold text-[#00a0e3]">KonnYoeung</span>
+        <span className="text-xl font-bold text-[#33A6DC]">KonnYoeung</span>
       </div>
 
       {/* Middle: Navigation Links */}
-      <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
-        <Link to="/" className="text-black border-b-2 border-black pb-1">Home</Link>
-        <Link to="/features" className="hover:text-blue-500 transition">Feature</Link>
-        <Link to="/about" className="hover:text-blue-500 transition">About Us</Link>
-        <Link to="/contact" className="hover:text-blue-500 transition">Contact Us</Link>
-      </div>
+    <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium ml-auto mr-8">
+      <Link to="/" className="text-black border-b-2 border-black pb-1">Home</Link>
+      <Link to="/features" className="hover:text-blue-500 transition">Feature</Link>
+      <Link to="/about" className="hover:text-blue-500 transition">About Us</Link>
+      <Link to="/contact" className="hover:text-blue-500 transition">Contact Us</Link>
+    </div>
 
       {/* Right side: Language & Profile */}
       <div className="flex items-center gap-4">
