@@ -1,14 +1,15 @@
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from '../src/pages/Auth/Login';
 function App() {
 
   return (
-    <>
-      <h1 className="text-3xl font-bold text-red-600">
-  Tailwind v4 is working
-</h1>
-
-    </>
-  )
+    <Router>
+      <Login /> {/* This stays on top of every page */}
+      <Routes>
+        {/* Add your other routes here */}
+      </Routes>
+    </Router>
+  );
 }
 
 export default App
