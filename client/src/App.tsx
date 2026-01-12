@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from '../src/components/Layout/Navbar';
 import Footer from '../src/components/Layout/Footer';
+import Login  from './pages/Auth/Login';
 function App() {
 
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         {/* Add your other routes here */}
       </Routes>
+      <Login />
       <Footer />
     </Router>
   );
