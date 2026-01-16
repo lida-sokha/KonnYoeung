@@ -8,7 +8,7 @@ function App() {
     <Router>
       <Navbar /> {/* This stays on top of every page */}
       <Routes>
-        {/* Add your other routes here */}
+        <Route path='/' element={<HomePage />} />
       </Routes>
       <Login />
       <Footer />
