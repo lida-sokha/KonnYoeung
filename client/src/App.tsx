@@ -5,11 +5,12 @@ import Login  from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
 function App() {
 
+function App() {
   return (
     <Router>
       <SignUp /> This stays on top of every page
       <Routes>
-        {/* Add your other routes here */}
+        <Route path="/" element={<AboutUsPage />} />
       </Routes>
       
       
@@ -17,4 +18,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
