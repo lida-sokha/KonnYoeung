@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from '../src/components/Layout/Navbar';
-import Footer from '../src/components/Layout/Footer';
-import ContactUsPage from './pages/Contactus/Contact_us';
+import Navbar from './components/Layout/Navbar';
+import Footer from './components/Layout/Footer';
+import AboutUsPage from './pages/Aboutus/About_us';
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<ContactUsPage />} />
+        <Route path="/" element={<AboutUsPage />} />
       </Routes>
 
       <Footer />
