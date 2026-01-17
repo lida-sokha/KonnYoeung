@@ -1,15 +1,21 @@
 import { EyeOff } from "lucide-react";
 import loginImage from "../../assets/images/Login.png";
 
-
 export default function Login() {
   return (
-    <div className="min-h-screen w-full bg-white flex items-center justify-center">
+    <div className="h-screen w-screen flex items-center justify-center overflow-hidden">
       {/* Main container */}
-      <div className="w-[1512px] h-[982px] flex rounded-2xl overflow-hidden shadow-lg">
-
-        {/* LEFT SIDE – FORM */}
-        <div className="w-1/2 px-24 py-20 flex flex-col justify-center">
+      <div
+        className="w-[1512px] h-[982px] flex rounded-2xl overflow-hidden shadow-lg"
+        style={{
+          backgroundImage: `url(${loginImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* LEFT SIDE – FORM (40%) */}
+        <div className="w-2/5 px-24 py-20 flex flex-col justify-center bg-white">
           {/* Logo */}
           <div className="flex items-center gap-2 mb-10">
             <img src="/logo.svg" alt="KonnYoeung" className="h-10" />
@@ -81,15 +87,8 @@ export default function Login() {
           </p>
         </div>
 
-        {/* RIGHT SIDE – IMAGE */}
-        <div className="w-1/2 flex items-center justify-center padding-3">
-                <img
-                    src={loginImage}
-                    alt="Mother and baby"
-                    className="max-w-[100%]"
-                />
-                </div>
-
+        {/* RIGHT SIDE – EMPTY (shows background image) */}
+        <div className="w-3/5" />
       </div>
     </div>
   );
