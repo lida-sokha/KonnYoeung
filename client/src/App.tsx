@@ -1,19 +1,19 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from '../src/components/Layout/Navbar';
 import Footer from '../src/components/Layout/Footer';
-import HomePage from './pages/HomePage/HomePage';
-import Login  from './pages/Auth/Login';
-function App() {
+import ContactUsPage from './pages/Contactus/Contact_us';
 
+function App() {
   return (
     <Router>
-      <Navbar /> {/* This stays on top of every page */}
+      <Navbar />
+
       <Routes>
-        <Route path='/' element={<HomePage />} />
+        <Route path="/" element={<ContactUsPage />} />
       </Routes>
       <Footer />
     </Router>
   );
 }
 
-export default App
+export default App;
