@@ -1,19 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from '../src/components/Layout/Navbar';
 import Footer from '../src/components/Layout/Footer';
-import Login  from './pages/Auth/Login';
-import SignUp from './pages/Auth/Signup';
-function App() {
+import ContactUsPage from './pages/Contactus/Contact_us';
 
 function App() {
   return (
     <Router>
-      <SignUp /> This stays on top of every page
+      <Navbar />
+
       <Routes>
-        <Route path="/" element={<AboutUsPage />} />
+        <Route path="/" element={<ContactUsPage />} />
       </Routes>
-      
-      
+      <Footer />
     </Router>
   );
 }
