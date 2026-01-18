@@ -20,8 +20,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
       </Routes>
-
-      {/* Footer stays OUTSIDE Routes so it shows on every page */}
       <Footer />
     </Router>
   );

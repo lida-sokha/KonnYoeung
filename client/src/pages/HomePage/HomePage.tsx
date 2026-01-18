@@ -156,6 +156,7 @@ export default function HomePage() {
         </div>
       </div>
       <ProcessSection />
+      <ExistsSection />
     </div>
   );
 }
