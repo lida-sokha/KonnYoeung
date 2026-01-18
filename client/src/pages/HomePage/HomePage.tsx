@@ -118,7 +118,7 @@ export default function HomePage() {
     </div>
 
 {/* Everything you need */}
-       <div className='flex justify-center items-center py-5 md:py-20 bg-white flex flex-col space-y-3 px-6'>
+       <div id="features-section" className='flex justify-center items-center py-5 md:py-20 bg-white flex flex-col space-y-3 px-6'>
 
         <h1 className="text-2xl sm:text-md md:text-2xl lg:text-4xl font-bold text-[#3ba8df] font-['Jockey_One'] ">Everything You Need in One Place</h1>
         <p className='text-md sm:text-md md:text-md leading-relaxed max-w-lg text-center'>Comprehensive tools and resources to help you care for your child’s health with confidence.</p>
@@ -129,6 +129,8 @@ export default function HomePage() {
                 title="Check Symptoms Easily"
                 description="Answer simple questions about your child’s symptoms. Get a list of possible conditions, home care tips, and advice on whether to visit a clinic or hospital."
                 linkTo="/health"
+                iconBgColor='bg-green-100'
+                iconColor='text-green-500'
               />
               <StartGrid
               iconName="book"
