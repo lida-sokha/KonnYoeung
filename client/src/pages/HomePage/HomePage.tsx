@@ -4,6 +4,7 @@ import StartGrid from '../../components/Layout/Sections/StatsGrid';
 import TrustedGrid from '../../components/Layout/Sections/TrustedDataGrid';
 import ProcessSection from '../../components/Layout/Sections/ProcessSection';
 import ExistsSection from '../../components/Layout/Exists';
+import ParentSaidSection from '../../components/Layout/Parentsaid';
 
 export default function HomePage() {
   return (
@@ -24,7 +25,7 @@ export default function HomePage() {
           <div className="w-full max-w-2xl space-y-6 md:space-y-8">
             <h1 className="text-4xl sm:text-3xl md:text-3xl lg:text-5xl font-extrabold text-slate-900 leading-tight font-['Jockey_One']">
               Smart Parenting Starts <br className="hidden sm:block" />
-              with <span className="text-[#3ba8df]">KonnyYoeung</span>
+              with <span className="text-[#3ba8df]">KonnYoeung</span>
             </h1>
             
             <p className=" text-base sm:text-md md:text-md leading-relaxed max-w-lg">
@@ -157,6 +158,7 @@ export default function HomePage() {
       </div>
       <ProcessSection />
       <ExistsSection />
+      <ParentSaidSection />
     </div>
   );
 }

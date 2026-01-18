@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Navbar: React.FC = () => {
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-white ">
-      {/* Left side: Logo */}
+      <Link to="/">
       <div className="flex items-center gap-2">
         <img 
           src="../public/images/logo.png" 
@@ -13,8 +13,8 @@ const Navbar: React.FC = () => {
         />
         <span className="text-xl font-bold text-[#33A6DC]">KonnYoeung</span>
       </div>
+      </Link>
 
-      {/* Middle: Navigation Links */}
     <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium ml-auto mr-8">
       <Link to="/" className="text-black border-b-2 border-black pb-1">Home</Link>
       <Link to="/features" className="hover:text-blue-500 transition">Feature</Link>
