@@ -61,7 +61,7 @@ const StatsGrid = ({
         flex 
         flex-col 
         h-full 
-        border-3 
+        border-2
         border-slate-100 
         transition-all 
         duration-300
