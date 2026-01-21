@@ -1,5 +1,6 @@
-const swaggerJsDoc = require("swagger-jsdoc");
+const path = require("path");
 const swaggerUi = require("swagger-ui-express");
+const swaggerJsdoc = require("swagger-jsdoc");
 
 const options = {
   definition: {
@@ -7,18 +8,21 @@ const options = {
     info: {
       title: "KonnYoeung API",
       version: "1.0.0",
+      description: "API documentation for KonnYoeung backend",
     },
-    servers: [{ url: "http://localhost:5000" }]
+    servers: [
+      {
+        url: "http://localhost:5000",
+      },
+    ],
   },
-  // Since you are running app.js from the root 'server' folder, 
-  // this path tells Swagger where to find the documentation in your route files.
-  apis: ["./routes/*.js"] 
+  apis: [path.join(__dirname, "../routes/*.js")], // ✅ FIXED
 };
 
-const specs = swaggerJsDoc(options);
+const swaggerSpec = swaggerJsdoc(options);
 
-const setupSwagger = (app) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
-};
+function setupSwagger(app) {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
 
 module.exports = setupSwagger;

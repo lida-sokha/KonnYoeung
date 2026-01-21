@@ -15,7 +15,18 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true
+      required: false // Changed to false to allow Google Sign-in
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true // Allows multiple users to NOT have a googleId
+    },
+    otp: String,
+    otpExpires: Date,
+    isVerified: {
+      type: Boolean,
+      default: false
     },
     role: {
       type: String,
@@ -24,7 +35,7 @@ const userSchema = new mongoose.Schema(
     }
   },
   {
-    timestamps: true // creates createdAt & updatedAt
+    timestamps: true 
   }
 );
 

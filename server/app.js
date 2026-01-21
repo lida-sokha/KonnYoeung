@@ -1,30 +1,34 @@
-require('dotenv').config(); // Ensure this is at the very top
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const setupSwagger = require("./config/swagger"); 
-const testRoutes = require("./routes/test.route");
+const setupSwagger = require("../server/src/config/swagger");
+const userRoutes = require("./src/routes/user.route.js");
 
 const app = express();
 app.use(express.json());
 
-// 1. Connect to MongoDB Atlas using the variable from your .env file
-const dbURI = process.env.MONGODB_URI; 
-
-mongoose.connect(dbURI)
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("✅ MongoDB Atlas Connected Successfully");
-    
+    console.log("✅ MongoDB Atlas Connected");
+
+    // Swagger
     setupSwagger(app);
 
-    app.use("/api/test", testRoutes);
+    // Routes
+    app.use("/api/users", userRoutes);
+
+    // Root
+    app.get("/", (req, res) => {
+      res.send("KonnYoeung Backend is Running!");
+    });
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📖 Docs: http://localhost:${PORT}/api-docs`);
+      console.log(`📖 Swagger Docs: http://localhost:${PORT}/api-docs`);
     });
   })
   .catch(err => {
-    console.error("❌ MongoDB connection error detail:", err.message);
-    // This will tell us if it's a "Bad Password" or "IP Not Whitelisted" error
+    console.error("❌ MongoDB connection failed:", err.message);
   });
