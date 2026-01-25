@@ -1,5 +1,5 @@
 import { Mail, Phone, Facebook, Instagram } from 'lucide-react';
-
+import { Link } from 'react-router-dom';
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-[#79c6e6] to-[#5eb3d6] text-white">
@@ -8,10 +8,12 @@ const Footer = () => {
           
           <div className="space-y-4">
             <div className="flex items-center gap-3">
+              <Link to="/">
               <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg">
                 <img src='../public/images/logo1.png' alt='KonnYoeung Logo' className="h-10 w-auto" />
               </div>
-              <span className="text-2xl font-bold tracking-tight">KonnyYoeung</span>
+              </Link>
+              <span className="text-2xl font-bold tracking-tight">KonnYoeung</span>
             </div>
             <p className="text-white/90 text-sm leading-relaxed">
               Supporting Cambodian parents with reliable, bilingual resources to care for their children's health.
@@ -21,7 +23,7 @@ const Footer = () => {
           <div className="space-y-4 justify-center items-center">
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <nav className="flex flex-col space-y-2">
-              <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">Home</a>
+              <a href="/" className="text-white/90 hover:text-white transition-colors text-sm">Home</a>
               <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">Feature</a>
               <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">About Us</a>
               <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">Contact Us</a>
