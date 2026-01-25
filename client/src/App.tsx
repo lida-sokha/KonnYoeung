@@ -5,7 +5,7 @@ import AboutUsPage from './pages/Aboutus/About_us';
 function App() {
   return (
     <Router>
-      <SignUp /> This stays on top of every page
+      
       <Routes>
         <Route path="/" element={<AboutUsPage />} />
       </Routes>
