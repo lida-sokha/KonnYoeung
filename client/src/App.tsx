@@ -1,17 +1,22 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from '../src/components/Layout/Navbar';
 import Footer from '../src/components/Layout/Footer';
 import HomePage from './pages/HomePage/HomePage';
-import Login  from './pages/Auth/Login';
+import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
 import AboutUsPage from './pages/Aboutus/About_us';
-import ContactUs from './pages/Contactus/Contact_us'; // Don't forget your new page!
+import ContactUs from './pages/Contactus/Contact_us'; 
+import DashboardPage from './pages/Dashboard/Dashboard';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+
+  const hideLayout = ['/login', '/signup', '/Dashboard'].includes(location.pathname);
+
   return (
-    <Router>
-      {/* Navbar stays OUTSIDE Routes so it shows on every page */}
-      <Navbar /> 
+    <>
+      {/* Show Navbar only if hideLayout is false */}
+      {!hideLayout && <Navbar />} 
       
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -19,8 +24,19 @@ function App() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path='/Dashboard' element={<DashboardPage />} />
       </Routes>
-      <Footer />
+      
+      {/* Show Footer only if hideLayout is false */}
+      {!hideLayout && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
