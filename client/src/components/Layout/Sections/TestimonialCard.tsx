@@ -32,8 +32,8 @@ const TestimonialCard = ({ name, location, description, rating }: TestimonialCar
         ))}
       </div>
 
-      <p className="text-slate-600 text-sm leading-relaxed italic">
-        "{description}"
+      <p className="text-slate-600 text-sm ">
+        {description}
       </p>
     </div>
   );
