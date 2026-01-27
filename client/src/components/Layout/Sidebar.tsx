@@ -14,11 +14,12 @@ const Sidebar=() => {
     return (
         //if want to change the x-padding between the sidebar and the content (p-4)
         <div className='flex min-h-full w-64 flex-col bg-[#34AADC] p-4 text-white sticky top-0'>
+            <Link to="/">
             <div className="mb-10 flex items-center gap-2 ">
                 <img src="/images/white_logo.PNG" alt="Logo" className="h-20 w-20" />
                 <span className="text-xl font-bold">KonnYoeung</span>
             </div>
-            
+            </Link>
             <nav className='flex-1 space-y-5'>
                 {menuItems.map((item) => {
                     const isActive = location.pathname === item.path;
