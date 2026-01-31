@@ -1,15 +1,15 @@
 import React from 'react';
-
+import { FaFacebook, FaLinkedin } from 'react-icons/fa';
 const AboutUsPage: React.FC = () => {
   return (
     <div className="w-full bg-white">
 
       {/* HERO SECTION */}
-      <section className="bg-sky-100 py-20 text-center px-4">
+      <section className="bg-sky-300 py-20 text-center px-4">
         <h1 className="text-4xl font-bold">
-          About <span className="text-sky-500">Konn Yoeung</span>
+          About <span className="text-white">Konn Yoeung</span>
         </h1>
-        <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+        <p className="mt-4 text-blue-900 max-w-2xl mx-auto">
           A data-driven web platform empowering Cambodian parents
           with reliable child healthcare guidance
         </p>
@@ -18,7 +18,7 @@ const AboutUsPage: React.FC = () => {
       {/* MISSION SECTION */}
       <section className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <h2 className="text-3xl font-bold mb-4">Our Mission</h2>
+          <h2 className="text-4xl font-bold mb-4">Our Mission</h2>
           <p className="text-gray-600 leading-relaxed">
             To empower Cambodian parents and caregivers with accessible,
             reliable, and age-specific child healthcare guidance. We aim to
@@ -28,7 +28,7 @@ const AboutUsPage: React.FC = () => {
         </div>
 
        <div className="border-4 border-sky-400 flex items-center justify-center h-72">
-            <span className="text-[140px] leading-none">🎯</span>
+            <img src="/images/goal.png" alt="Goal" className="w-full h-full object-contain" />
             </div>
 
       </section>
@@ -36,12 +36,12 @@ const AboutUsPage: React.FC = () => {
       {/* VISION SECTION */}
       <section className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div className="border-4 border-sky-400 flex items-center justify-center h-72">
-        <span className="text-[140px] leading-none">👁️</span>
+        <img src="/images/eye.png" alt="Vision" className="w-full h-full object-contain" />
         </div>
 
 
         <div>
-          <h2 className="text-3xl font-bold mb-4">Our Vision</h2>
+          <h2 className="text-4xl font-bold mb-4">Our Vision</h2>
           <p className="text-gray-600 leading-relaxed">
             To be the trusted, go-to digital platform for child health
             information in Cambodia. By providing immediate, accurate
@@ -94,8 +94,8 @@ const AboutUsPage: React.FC = () => {
             <p className="text-sky-500 text-sm mt-1">{member.role}</p>
 
             <div className="flex justify-center gap-4 mt-3 text-gray-500">
-              <span>f</span>
-              <span>in</span>
+              <FaFacebook className="w-6 h-6 text-sky-500 hover:text-sky-700 cursor-pointer "/>
+              <FaLinkedin className="w-6 h-6 text-sky-500 hover:text-sky-700 cursor-pointer "/>
             </div>
           </div>
         ))}
