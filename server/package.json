@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "nodemon app.js",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -12,9 +12,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.4",
+    "nodemailer": "^7.0.12",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
