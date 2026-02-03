@@ -38,7 +38,7 @@ export default function HomePage() {
               <Button
                 text='Get Started Now'
                 onClick={() => console.log("button clicked")}
-              />
+                />
             </div>
 
             <div className="md:hidden w-full max-w-md mx-auto pt-8">

@@ -1,85 +1,114 @@
-import { EyeOff } from "lucide-react";
-import signupImage from "../../assets/images/Login.png"; // reuse same image
+import { EyeOff, Link } from "lucide-react";
+import signupImage from "../../../public/images/Login.png"; // Reusing the same image as requested
 
 export default function SignUp() {
   return (
-    <div
-      className="h-screen w-screen bg-cover bg-center flex items-center"
-      style={{ backgroundImage: `url(${signupImage})` }}
-    >
-      {/* FORM CONTAINER (50%) */}
-      <div className="w-1/2 h-full bg-white flex flex-col justify-center px-24 shadow-xl">
-        
-        {/* Logo */}
-        <div className="flex items-center gap-2 mb-10">
-          <img src="/logo.svg" alt="KonnYoeung" className="h-10" />
-          <span className="text-xl font-semibold text-sky-500">
+    /* Full screen container with no overflow */
+    <div className="h-screen w-screen flex overflow-hidden bg-white">
+
+      {/* LEFT SIDE – FORM (Exactly 50%) */}
+      <div className="w-full lg:w-1/2 h-full p-12 lg:p-24 flex flex-col justify-center bg-white">
+
+        {/* Logo Section */}
+        <div className="flex items-center gap-3 mb-10 pt-10">
+          <img src="/images/logo1.png" alt="KonnYoeung" className="h-10 w-auto" />
+          <span className="text-2xl font-bold text-sky-500 tracking-tight">
             KonnYoeung
           </span>
+          </div>
+
+        {/* Header */}
+        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">Sign Up</h1>
+
+        <div className="space-y-4 max-w-md">
+          {/* Full Name */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+            <input
+              type="text"
+              placeholder="Enter your full name"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+            />
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+            <div className="relative">
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+              />
+              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <EyeOff size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+            <div className="relative">
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+              />
+            </div>
+          </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-10">Sign Up</h1>
-
-        {/* Full Name */}
-        <label className="text-sm font-medium mb-2">Full Name</label>
-        <input
-          type="text"
-          className="mb-5 w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
-        />
-
-        {/* Email */}
-        <label className="text-sm font-medium mb-2">Email</label>
-        <input
-          type="email"
-          className="mb-5 w-full rounded-md border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-400"
-        />
-
-        {/* Password */}
-        <label className="text-sm font-medium mb-2">Password</label>
-        <div className="relative mb-5">
-          <input
-            type="password"
-            className="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400"
-          />
-          <EyeOff className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />
+        {/* Create Account Button */}
+        <div className="max-w-md">
+          <button className="mt-8 w-full rounded-xl bg-sky-500 py-4 text-white font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]">
+            Create Account
+          </button>
         </div>
 
-        {/* Confirm Password */}
-        <label className="text-sm font-medium mb-2">Confirm Password</label>
-        <div className="relative mb-8">
-          <input
-            type="password"
-            className="w-full rounded-md border border-gray-300 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400"
-          />
-          <EyeOff className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer" />
+        {/* Divider */}
+        <div className="relative my-6 text-center max-w-md">
+          <hr className="border-gray-100" />
+          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-400 text-sm">or</span>
         </div>
 
-        {/* Sign Up Button */}
-        <button className="mb-6 w-full rounded-md bg-sky-500 py-3 text-white font-semibold hover:bg-sky-600 transition">
-          Create Account
-        </button>
-
-        <div className="text-center text-gray-400 mb-6">or</div>
-
-        {/* Social */}
-        <button className="mb-3 w-full flex items-center justify-center gap-3 rounded-md border py-3 hover:bg-gray-50">
-          <img src="/google.svg" className="h-5" />
-          Continue with Google
-        </button>
-
-        <button className="w-full flex items-center justify-center gap-3 rounded-md border py-3 hover:bg-gray-50">
-          <img src="/facebook.svg" className="h-5" />
-          Continue with Facebook
-        </button>
+        {/* Social Link */}
+        <div className="max-w-md">
+          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
+            <img src="/images/google_logo.png" className="h-5" alt="Google" />
+            Continue with Google
+          </button>
+        </div>
 
         {/* Login link */}
-        <p className="mt-8 text-sm text-center">
+        <p className="mt-8 text-sm text-center max-w-md text-gray-600">
           Already have an account?{" "}
-          <a href="/login" className="text-sky-500 font-medium">
+          <a href="/login" className="text-sky-500 font-bold hover:underline">
             Login
           </a>
         </p>
       </div>
+
+      {/* RIGHT SIDE – IMAGE (Exactly 50%) */}
+      <div
+        className="hidden lg:block lg:w-1/2 h-full"
+        style={{
+          backgroundImage: `url(${signupImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+      />
     </div>
   );
 }
