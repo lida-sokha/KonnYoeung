@@ -10,7 +10,7 @@ const Footer = () => {
             <div className="flex items-center gap-3">
               <Link to="/">
               <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg">
-                <img src='../public/images/logo1.png' alt='KonnYoeung Logo' className="h-10 w-auto" />
+                <img src='/images/logo1.png' alt='KonnYoeung Logo' className="h-10 w-auto" />
               </div>
               </Link>
               <span className="text-2xl font-bold tracking-tight">KonnYoeung</span>
