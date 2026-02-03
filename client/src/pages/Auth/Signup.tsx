@@ -10,7 +10,7 @@ export default function SignUp() {
       <div className="w-full lg:w-1/2 h-full p-12 lg:p-24 flex flex-col justify-center bg-white">
 
         {/* Logo Section */}
-        <div className="flex items-center gap-3 mb-10 pt-10">
+        <div className="flex items-center gap-3 mb-10 pt-15">
           <img src="/images/logo1.png" alt="KonnYoeung" className="h-10 w-auto" />
           <span className="text-2xl font-bold text-sky-500 tracking-tight">
             KonnYoeung

@@ -30,7 +30,6 @@ const AboutUsPage: React.FC = () => {
        <div className="border-4 border-sky-400 flex items-center justify-center h-72">
             <img src="/images/goal.png" alt="Goal" className="w-full h-full object-contain" />
             </div>
-
       </section>
 
       {/* VISION SECTION */}
