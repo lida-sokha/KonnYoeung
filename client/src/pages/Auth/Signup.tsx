@@ -1,4 +1,4 @@
-import { EyeOff, Link } from "lucide-react";
+import { EyeOff } from "lucide-react";
 import signupImage from "../../../public/images/Login.png"; // Reusing the same image as requested
 
 export default function SignUp() {
@@ -51,7 +51,6 @@ export default function SignUp() {
                 className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
               />
               <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <EyeOff size={18} />
               </button>
             </div>
           </div>
