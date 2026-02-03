@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import HospitalCard, { Hospital } from "../components/HospitalCard";
+import HospitalCard, { Hospital } from "../components/Sidebar.tsx";
 
 // Import your local images
 import calmetteImg from "../assets/hospitals/calmette.jpg";
