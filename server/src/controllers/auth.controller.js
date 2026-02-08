@@ -4,35 +4,64 @@ const jwt = require("jsonwebtoken");
 const generateOTP = require("../utils/generateOTP");
 const sendEmail = require("../utils/sendEmail");
 
-// 1. SIGNUP: User created, but not verified
+// 1. SIGNUP: User created and logged in immediately
 exports.signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
-    // Check if data reached the server
     if (!fullName || !email || !password) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Missing fields! Please provide name, email, and password." 
+      return res.status(400).json({
+        success: false,
+        message: "Missing fields! Please provide name, email, and password."
       });
     }
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ fullName, email, password: hashedPassword, isVerified: false });
 
-    // SUCCESS MESSAGE
-    res.status(201).json({ 
-      success: true, 
-      message: "User created successfully!", 
-      data: user 
+    // Check if user already exists (Good practice to prevent crashes)
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email already in use." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user (Setting isVerified to true to allow immediate access)
+    const user = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+      isVerified: true
+    });
+
+    // Generate JWT Token so they don't have to login again
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET || "temp_secret",
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, { 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    // SUCCESS: Send token and user data
+    res.status(201).json({
+      success: true,
+      message: "User created successfully!",
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email
+      }
     });
 
   } catch (err) {
-    // ERROR MESSAGE
-    console.error(err); // This prints the error in your terminal
-    res.status(500).json({ 
-      success: false, 
-      message: "Database Error: " + err.message 
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Database Error: " + err.message
     });
   }
 };
@@ -172,6 +201,23 @@ exports.googleLogin = async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: "Google Login Failed: " + err.message 
+    });
+  }
+}; 
+
+// --- Add this at the very end of auth.controller.js ---
+
+exports.checkAuth = async (req, res) => {
+  try {
+    // req.user is already verified and attached by the 'protect' middleware
+    res.status(200).json({
+      success: true,
+      user: req.user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error in checkAuth: " + error.message
     });
   }
 };

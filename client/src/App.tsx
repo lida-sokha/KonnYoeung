@@ -7,7 +7,7 @@ import SignUp from './pages/Auth/Signup';
 import AboutUsPage from './pages/Aboutus/About_us';
 import ContactUs from './pages/Contactus/Contact_us'; 
 import DashboardPage from './pages/Dashboard/Dashboard';
-
+import ProtectedRoute from './components/auth/ProtectedRoute';
 function AppContent() {
   const location = useLocation();
 
@@ -24,7 +24,14 @@ function AppContent() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path='/Dashboard' element={<DashboardPage />} />
+        <Route
+          path="/Dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       
       {/* Show Footer only if hideLayout is false */}

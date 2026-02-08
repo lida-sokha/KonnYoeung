@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { signup, login, verifyOtp, googleLogin } = require("../controllers/auth.controller");
-
+const { signup, login, verifyOtp, googleLogin, checkAuth } = require("../controllers/auth.controller");
+const { protect } = require("../middlewares/auth.middleware");
 /**
  * @swagger
  * /api/users/signup:
@@ -178,4 +178,28 @@ router.post("/verify-otp", verifyOtp);
  */
 router.post("/google", googleLogin);
 
+/**
+ * @swagger
+ * /api/users/check-auth:
+ *   get:
+ *     summary: Verify if user is logged in via Cookie
+ *     tags:
+ *       - Auth
+ *     responses:
+ *       200:
+ *         description: User is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Not authorized (Invalid or missing cookie)
+ */
+router.get("/check-auth", protect, checkAuth);
 module.exports = router;

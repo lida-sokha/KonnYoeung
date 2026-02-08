@@ -1,7 +1,40 @@
-import { EyeOff } from "lucide-react";
-import signupImage from "../../../public/images/Login.png"; // Reusing the same image as requested
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // For redirecting
+import signupImage from "../../../public/images/Login.png"; // Fix path as per above
+import API from "../../services/api"
 export default function SignUp() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const handleChange = (e:any) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  // Signup.tsx
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    try {
+      const response = await API.post("/users/signup", formData);
+
+      if (response.data.success) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        navigate("/Dashboard");
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Signup failed");
+    }
+  };
+
   return (
     /* Full screen container with no overflow */
     <div className="h-screen w-screen flex overflow-hidden bg-white">
@@ -15,7 +48,7 @@ export default function SignUp() {
           <span className="text-2xl font-bold text-sky-500 tracking-tight">
             KonnYoeung
           </span>
-          </div>
+        </div>
 
         {/* Header */}
         <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">Sign Up</h1>
@@ -25,6 +58,9 @@ export default function SignUp() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
             <input
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
               type="text"
               placeholder="Enter your full name"
               className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
@@ -35,6 +71,9 @@ export default function SignUp() {
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <input
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               type="email"
               placeholder="Enter your email"
               className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
@@ -46,6 +85,9 @@ export default function SignUp() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
             <div className="relative">
               <input
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 type="password"
                 placeholder="••••••••"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
@@ -60,6 +102,9 @@ export default function SignUp() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
             <div className="relative">
               <input
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 type="password"
                 placeholder="••••••••"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
@@ -70,9 +115,11 @@ export default function SignUp() {
 
         {/* Create Account Button */}
         <div className="max-w-md">
-          <button className="mt-8 w-full rounded-xl bg-sky-500 py-4 text-white font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]">
-            Create Account
-          </button>
+          <form onSubmit={handleSubmit}>
+            <button className="mt-8 w-full rounded-xl bg-sky-500 py-4 text-white font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]">
+              Create Account
+            </button>
+          </form>
         </div>
 
         {/* Divider */}
