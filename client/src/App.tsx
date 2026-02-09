@@ -7,6 +7,7 @@ import SignUp from './pages/Auth/Signup';
 import AboutUsPage from './pages/Aboutus/About_us';
 import ContactUs from './pages/Contactus/Contact_us'; 
 import DashboardPage from './pages/Dashboard/Dashboard';
+import CreateArticle from'./pages/Admin/Create_article';
 
 function AppContent() {
   const location = useLocation();
@@ -25,6 +26,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path='/Dashboard' element={<DashboardPage />} />
+        <Route path='/CreateArticle' element={<CreateArticle />} />
       </Routes>
       
       {/* Show Footer only if hideLayout is false */}
