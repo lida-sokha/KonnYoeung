@@ -75,14 +75,14 @@ router.post("/signup", signup);
  *               password: { type: string, example: "123456" }
  *     responses:
  *       200:
- *         description: OTP generated and sent successfully
+ *         description: OTP generated and sent successfullyOTP verified successfully. Cookie 'token' has been set.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 success: { type: boolean, example: true }
- *                 message: { type: string, example: "OTP sent to your email (check console log)" }
+ *                 message: { type: string, example: "OTP sent to your email" }
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -202,4 +202,6 @@ router.post("/google", googleLogin);
  *         description: Not authorized (Invalid or missing cookie)
  */
 router.get("/check-auth", protect, checkAuth);
+
+router.post("/resend-otp", resendOtp);
 module.exports = router;

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirecting
 import signupImage from "../../../public/images/Login.png"; // Fix path as per above
-import API from "../../services/api"
+import API from "../../services/api";
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
 export default function SignUp() {
   const navigate = useNavigate();
 
@@ -27,13 +29,36 @@ export default function SignUp() {
       const response = await API.post("/users/signup", formData);
 
       if (response.data.success) {
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        navigate("/Dashboard");
+        navigate("/verify", { state: { email: formData.email } });
       }
     } catch (err: any) {
       alert(err.response?.data?.message || "Signup failed");
     }
   };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      const decoded: any = jwtDecode(credentialResponse.credential);
+
+      // 2. Send to your backend
+      const response = await API.post("/users/google", {
+        email: decoded.email,
+        fullName: decoded.name,
+        googleId: decoded.sub, // 'sub' is the unique Google ID
+      });
+
+      if (response.data.success) {
+        navigate("/Dashboard");
+      }
+    } catch (err: any) {
+      alert("Google Login Failed");
+    }
+  };
+
+  <GoogleLogin
+    onSuccess={handleGoogleSuccess}
+    onError={() => console.log('Login Failed')}
+  />
 
   return (
     /* Full screen container with no overflow */
@@ -130,10 +155,12 @@ export default function SignUp() {
 
         {/* Social Link */}
         <div className="max-w-md">
+          <form onSubmit={handleGoogleSuccess}>
           <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
             <img src="/images/google_logo.png" className="h-5" alt="Google" />
             Continue with Google
-          </button>
+            </button>
+            </form>
         </div>
 
         {/* Login link */}

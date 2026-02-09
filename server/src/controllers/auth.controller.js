@@ -3,66 +3,50 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const generateOTP = require("../utils/generateOTP");
 const sendEmail = require("../utils/sendEmail");
+const { sourceMapsEnabled } = require("process");
 
 // 1. SIGNUP: User created and logged in immediately
 exports.signup = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
+    // 1. Validation
     if (!fullName || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing fields! Please provide name, email, and password."
-      });
+      return res.status(400).json({ success: false, message: "Missing fields!" });
     }
 
-    // Check if user already exists (Good practice to prevent crashes)
+    // 2. Check if user exists
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    if (existingUser && existingUser.isVerified) {
       return res.status(400).json({ success: false, message: "Email already in use." });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const otp = generateOTP();
+    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    // Create the user (Setting isVerified to true to allow immediate access)
-    const user = await User.create({
-      fullName,
-      email,
-      password: hashedPassword,
-      isVerified: true
-    });
-
-    // Generate JWT Token so they don't have to login again
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET || "temp_secret",
-      { expiresIn: "1d" }
+    // 3. Create or Update User (upsert handles retries)
+    const user = await User.findOneAndUpdate(
+      { email },
+      { fullName, email, password: hashedPassword, otp, otpExpires, isVerified: false },
+      { upsert: true, new: true }
     );
 
-    res.cookie("token", token, { 
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    // 4. Send the Email
+    await sendEmail(
+      email,
+      "Verify your KonnYoeung Account",
+      `Your verification code is: ${otp}. It expires in 10 minutes.`
+    );
 
-    // SUCCESS: Send token and user data
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "User created successfully!",
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email
-      }
+      message: "OTP sent to your email. Please verify to continue."
     });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      success: false,
-      message: "Database Error: " + err.message
-    });
+    res.status(500).json({ success: false, message: "Server Error: " + err.message });
   }
 };
 
@@ -105,51 +89,45 @@ exports.login = async (req, res) => {
 exports.verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    
-    // 1. Find user with matching email, OTP, and check if not expired
-    const user = await User.findOne({ 
-      email, 
-      otp, 
-      otpExpires: { $gt: Date.now() } 
+
+    const user = await User.findOne({
+      email,
+      otp,
+      otpExpires: { $gt: Date.now() }
     });
 
     if (!user) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Invalid or expired OTP" 
-      });
+      return res.status(400).json({ success: false, message: "Invalid or expired OTP." });
     }
 
-    // 2. Clear OTP fields and verify user
+    // Mark as verified
     user.isVerified = true;
-    user.otp = undefined; 
+    user.otp = undefined; // Clear OTP
     user.otpExpires = undefined;
     await user.save();
 
-    // 3. Create JWT Token
+    // 5. NOW generate the Token and Cookie
     const token = jwt.sign(
-      { id: user._id }, 
-      process.env.JWT_SECRET || 'your_secret_key', 
-      { expiresIn: '1d' }
+      { id: user._id },
+      process.env.JWT_SECRET || "temp_secret",
+      { expiresIn: "1d" }
     );
 
-    // 4. Send SUCCESS response
-    res.status(200).json({ 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json({
       success: true,
-      message: "OTP Verified! Login successful.",
-      token,
-      user: { 
-        id: user._id, 
-        fullName: user.fullName, 
-        email: user.email, 
-        isVerified: user.isVerified 
-      }
+      message: "Email verified! You are now logged in.",
+      user: { id: user._id, fullName: user.fullName, email: user.email }
     });
+
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Server Error: " + err.message 
-    });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -158,52 +136,36 @@ exports.googleLogin = async (req, res) => {
   try {
     const { email, fullName, googleId } = req.body;
 
-    // 1. Check if user exists by email
     let user = await User.findOne({ email });
 
     if (!user) {
-      // 2. Create new user if they don't exist
       user = await User.create({
-        email,
         fullName,
+        email,
         googleId,
-        isVerified: true, // Google accounts are pre-verified
-        role: "parent"
+        isVerified: true, // Auto-verify Google users
+        password: Math.random().toString(36).slice(-10), // Random password placeholder
       });
-    } else {
-      // 3. If user exists but doesn't have a googleId, link it
-      if (!user.googleId) {
-        user.googleId = googleId;
-        user.isVerified = true;
-        await user.save();
-      }
     }
 
-    // 4. Create JWT Token
-    const token = jwt.sign(
-      { id: user._id }, 
-      process.env.JWT_SECRET || 'your_secret_key', 
-      { expiresIn: '1d' }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-    res.status(200).json({ 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.status(200).json({
       success: true,
-      message: "Google Login successful", 
-      token, 
-      user: {
-        id: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        role: user.role
-      }
+      message: "Google Login successful",
+      user: { id: user._id, fullName: user.fullName, email: user.email }
     });
-  } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Google Login Failed: " + err.message 
-    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
-}; 
+};
 
 // --- Add this at the very end of auth.controller.js ---
 
@@ -221,3 +183,29 @@ exports.checkAuth = async (req, res) => {
     });
   }
 };
+
+exports.resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!User) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = newotp;
+    user.otpExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    await sendEmail(
+      email,
+      "Your New Verification Code",
+      `Your new verification code is: ${newOtp}. It expires in 10 minutes.`
+    );
+    res.status(200).json({
+      success: true, message: "A new OTP has been sent!"
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
