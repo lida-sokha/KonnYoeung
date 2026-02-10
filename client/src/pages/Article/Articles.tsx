@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import { useNavigate } from "react-router-dom";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -10,13 +11,13 @@ import {
 
 const ArticlePage = () => {
   const [activeTab, setActiveTab] = useState("Symptoms");
-
+  const navigate = useNavigate();
   const tabs = [
     "All",
     "Symptoms",
     "Illness",
     "Emergency",
-    "First-Aids",
+    "First-Aids", 
     "Prevention & Care",
   ];
 
@@ -76,6 +77,7 @@ const ArticlePage = () => {
           {articles.map((article) => (
             <div
               key={article.id}
+              onClick={()=>navigate(`/articles/${article.id}`)}
               className="bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all overflow-hidden flex flex-col"
             >
               <img

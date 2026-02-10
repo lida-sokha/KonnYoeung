@@ -8,6 +8,7 @@ import AboutUsPage from './pages/Aboutus/About_us';
 import ContactUs from './pages/Contactus/Contact_us'; 
 import DashboardPage from './pages/Dashboard/Dashboard';
 import ArticlePage from './pages/Article/Articles';
+import ArticleDetail from './pages/Article/ArticleDetail';
 
 
 function AppContent() {
@@ -28,6 +29,7 @@ function AppContent() {
         <Route path="/signup" element={<SignUp />} />
         <Route path='/Dashboard' element={<DashboardPage />} />
         <Route path="/articles" element={<ArticlePage />} /> 
+        <Route path="/articles/:id" element={<ArticleDetail />} />
       </Routes>
 
       
