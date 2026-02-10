@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // For redirecting
-import signupImage from "../../../public/images/Login.png"; // Fix path as per above
+import { useNavigate } from "react-router-dom";
+import signupImage from "../../../public/images/login-removebg-preview.png";
 import API from "../../services/api";
-import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
+
 export default function SignUp() {
   const navigate = useNavigate();
 
@@ -14,174 +14,134 @@ export default function SignUp() {
     confirmPassword: ""
   });
 
-  const handleChange = (e:any) => {
+  const [error, setError] = useState("");
+
+  const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    setFormData({ ...formData, [name]: value });
+
+    // Clear error while typing
+    setError("");
   };
 
-  // Signup.tsx
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+
+    // ✅ Password validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
       const response = await API.post("/users/signup", formData);
-
       if (response.data.success) {
         navigate("/verify", { state: { email: formData.email } });
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || "Signup failed");
+      setError(err.response?.data?.message || "Signup failed");
     }
   };
-
-  const handleGoogleSuccess = async (credentialResponse: any) => {
-    try {
-      const decoded: any = jwtDecode(credentialResponse.credential);
-
-      // 2. Send to your backend
-      const response = await API.post("/users/google", {
-        email: decoded.email,
-        fullName: decoded.name,
-        googleId: decoded.sub, // 'sub' is the unique Google ID
-      });
-
-      if (response.data.success) {
-        navigate("/Dashboard");
-      }
-    } catch (err: any) {
-      alert("Google Login Failed");
-    }
-  };
-
-  <GoogleLogin
-    onSuccess={handleGoogleSuccess}
-    onError={() => console.log('Login Failed')}
-  />
 
   return (
-    /* Full screen container with no overflow */
-    <div className="h-screen w-screen flex overflow-hidden bg-white">
+    <div className="h-screen w-screen flex bg-gray-50">
 
-      {/* LEFT SIDE – FORM (Exactly 50%) */}
-      <div className="w-full lg:w-1/2 h-full p-12 lg:p-24 flex flex-col justify-center bg-white">
+      {/* LEFT SIDE – FORM */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
 
-        {/* Logo Section */}
-        <div className="flex items-center gap-3 mb-10 pt-15">
-          <img src="/images/logo1.png" alt="KonnYoeung" className="h-10 w-auto" />
-          <span className="text-2xl font-bold text-sky-500 tracking-tight">
-            KonnYoeung
-          </span>
-        </div>
+        <div className="w-full max-w-md bg-white p-10 rounded-2xl shadow-sm">
 
-        {/* Header */}
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">Sign Up</h1>
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-8">
+            <img src="/images/logo1.png" className="h-10" />
+            <span className="text-2xl font-bold text-sky-500">
+              KonnYoeung
+            </span>
+          </div>
 
-        <div className="space-y-4 max-w-md">
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+            Create Account
+          </h1>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Full Name */}
             <input
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              type="text"
-              placeholder="Enter your full name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+              placeholder="Full Name"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-sky-400"
+              required
             />
-          </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+            {/* Email */}
             <input
               name="email"
+              type="email"
               value={formData.email}
               onChange={handleChange}
-              type="email"
-              placeholder="Enter your email"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+              placeholder="Email"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-sky-400"
+              required
             />
-          </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-            <div className="relative">
-              <input
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                type="password"
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
-              />
-              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-              </button>
-            </div>
-          </div>
+            {/* Password */}
+            <input
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Password"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-sky-400"
+              required
+            />
 
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
-            <div className="relative">
-              <input
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                type="password"
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
-              />
-            </div>
-          </div>
-        </div>
+            {/* Confirm Password */}
+            <input
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm Password"
+              className={`w-full rounded-xl border px-4 py-3 focus:ring-2 ${error ? "border-red-400 focus:ring-red-400" : "focus:ring-sky-400"
+                }`}
+              required
+            />
 
-        {/* Create Account Button */}
-        <div className="max-w-md">
-          <form onSubmit={handleSubmit}>
-            <button className="mt-8 w-full rounded-xl bg-sky-500 py-4 text-white font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]">
+            {/* Error Message */}
+            {error && (
+              <p className="text-sm text-red-500">{error}</p>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full bg-sky-500 text-white py-3 rounded-xl font-bold hover:bg-sky-600 transition"
+            >
               Create Account
             </button>
           </form>
-        </div>
 
-        {/* Divider */}
-        <div className="relative my-6 text-center max-w-md">
-          <hr className="border-gray-100" />
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-400 text-sm">or</span>
+          {/* Login Link */}
+          <p className="text-sm text-center mt-6 text-gray-600">
+            Already have an account?{" "}
+            <a href="/login" className="text-sky-500 font-semibold hover:underline">
+              Login
+            </a>
+          </p>
         </div>
-
-        {/* Social Link */}
-        <div className="max-w-md">
-          <form onSubmit={handleGoogleSuccess}>
-          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
-            <img src="/images/google_logo.png" className="h-5" alt="Google" />
-            Continue with Google
-            </button>
-            </form>
-        </div>
-
-        {/* Login link */}
-        <p className="mt-8 text-sm text-center max-w-md text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="text-sky-500 font-bold hover:underline">
-            Login
-          </a>
-        </p>
       </div>
 
-      {/* RIGHT SIDE – IMAGE (Exactly 50%) */}
-      <div
-        className="hidden lg:block lg:w-1/2 h-full"
-        style={{
-          backgroundImage: `url(${signupImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
-        }}
-      />
+      {/* RIGHT SIDE – IMAGE */}
+      <div className="hidden lg:flex w-1/2 items-center justify-center bg-white">
+        <img
+          src={signupImage}
+          alt="Signup"
+          className=" max-w-md object-contain"
+        />
+      </div>
+
     </div>
   );
 }
