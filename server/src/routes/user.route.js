@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { signup, login, verifyOtp, googleLogin, checkAuth } = require("../controllers/auth.controller");
+const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp } = require("../controllers/auth.controller");
 const { protect } = require("../middlewares/auth.middleware");
 /**
  * @swagger
@@ -203,5 +203,43 @@ router.post("/google", googleLogin);
  */
 router.get("/check-auth", protect, checkAuth);
 
+/**
+ * @swagger
+ * /api/users/resend-otp:
+ *   post:
+ *     summary: Resend OTP to user email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: OTP resent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: OTP has been resent to your email
+ *       400:
+ *         description: User not found or already verified
+ *       500:
+ *         description: Server error
+ */
 router.post("/resend-otp", resendOtp);
 module.exports = router;

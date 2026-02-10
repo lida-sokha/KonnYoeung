@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const setupSwagger = require("../server/src/config/swagger");
+const setupSwagger = require("./src/config/swagger.js");
 const userRoutes = require("./src/routes/user.route.js");
 
 const app = express();
