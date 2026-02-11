@@ -1,113 +1,125 @@
-import { EyeOff } from "lucide-react";
-import signupImage from "../../../public/images/Login.png"; // Reusing the same image as requested
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom"; // Use Link for internal routing
+import signupImage from "../../../public/images/login-removebg-preview.png";
+import API from "../../services/api";
 
 export default function SignUp() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setError("");
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      const response = await API.post("/users/signup", formData);
+      if (response.data.success) {
+        navigate("/verify", { state: { email: formData.email } });
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Signup failed");
+    }
+  };
+
+  // Common styles for inputs to keep the code clean
+  const inputStyle = `w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 transition-all`;
+
   return (
-    /* Full screen container with no overflow */
-    <div className="h-screen w-screen flex overflow-hidden bg-white">
-
-      {/* LEFT SIDE – FORM (Exactly 50%) */}
-      <div className="w-full lg:w-1/2 h-full p-12 lg:p-24 flex flex-col justify-center bg-white">
-
-        {/* Logo Section */}
-        <div className="flex items-center gap-3 mb-10 pt-15">
-          <img src="/images/logo1.png" alt="KonnYoeung" className="h-10 w-auto" />
-          <span className="text-2xl font-bold text-sky-500 tracking-tight">
-            KonnYoeung
-          </span>
+    <div className="h-screen w-screen flex overflow-hidden">
+      {/* LEFT SIDE – FORM */}
+      <div className="w-full lg:w-1/2 flex items-start justify-center px-6 bg-white lg:pt-20 pt-20">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-8">
+            <img src="/images/logo1.png" alt="Logo" className="h-10" />
+            <span className="text-2xl font-bold text-sky-500">KonnYoeung</span>
           </div>
 
-        {/* Header */}
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">Sign Up</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">Create Account</h1>
 
-        <div className="space-y-4 max-w-md">
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <input
-              type="text"
-              placeholder="Enter your full name"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="Full Name"
+              className={inputStyle}
+              required
             />
-          </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
             <input
+              name="email"
               type="email"
-              placeholder="Enter your email"
-              className="w-full rounded-xl border border-gray-200 px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Email"
+              className={inputStyle}
+              required
             />
-          </div>
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-            <div className="relative">
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
-              />
-              <button className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-              </button>
-            </div>
-          </div>
+            <input
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Password"
+              className={inputStyle}
+              required
+            />
 
-          {/* Confirm Password */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
-            <div className="relative">
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3.5 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
-              />
-            </div>
-          </div>
+            <input
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm Password"
+              className={`${inputStyle} ${error ? "border-red-400 focus:border-red-400 focus:ring-red-400/20" : ""}`}
+              required
+            />
+
+            {error && <p className="text-sm text-red-500">{error}</p>}
+
+            <button
+              type="submit"
+              className="w-full bg-sky-500 text-white py-3 rounded-xl font-bold hover:bg-sky-600 transition-colors shadow-lg shadow-sky-200"
+            >
+              Create Account
+            </button>
+          </form>
+
+          <p className="text-sm text-center mt-6 text-gray-600">
+            Already have an account?{" "}
+            <Link to="/login" className="text-sky-500 font-semibold hover:underline">
+              Login
+            </Link>
+          </p>
         </div>
-
-        {/* Create Account Button */}
-        <div className="max-w-md">
-          <button className="mt-8 w-full rounded-xl bg-sky-500 py-4 text-white font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]">
-            Create Account
-          </button>
-        </div>
-
-        {/* Divider */}
-        <div className="relative my-6 text-center max-w-md">
-          <hr className="border-gray-100" />
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-400 text-sm">or</span>
-        </div>
-
-        {/* Social Link */}
-        <div className="max-w-md">
-          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
-            <img src="/images/google_logo.png" className="h-5" alt="Google" />
-            Continue with Google
-          </button>
-        </div>
-
-        {/* Login link */}
-        <p className="mt-8 text-sm text-center max-w-md text-gray-600">
-          Already have an account?{" "}
-          <a href="/login" className="text-sky-500 font-bold hover:underline">
-            Login
-          </a>
-        </p>
       </div>
 
-      {/* RIGHT SIDE – IMAGE (Exactly 50%) */}
-      <div
-        className="hidden lg:block lg:w-1/2 h-full"
-        style={{
-          backgroundImage: `url(${signupImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
-        }}
-      />
+      <div className="hidden lg:flex w-1/2 items-start justify-center pt-15">
+        <img
+          src={signupImage}
+          alt="Signup"
+          className="w-4/5 max-w-2xl object-contain"
+        />
+      </div>
     </div>
   );
 }
