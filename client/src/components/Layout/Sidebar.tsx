@@ -18,7 +18,7 @@ const Sidebar=() => {
             <div className="mb-10 flex items-center gap-2 ">
                 <img src="/images/white_logo.PNG" alt="Logo" className="h-20 w-20" />
                 <span className="text-xl font-bold">KonnYoeung</span>
-            </div>
+            </div>  
             </Link>
             <nav className='flex-1 space-y-5'>
                 {menuItems.map((item) => {

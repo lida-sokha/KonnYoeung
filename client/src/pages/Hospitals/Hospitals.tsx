@@ -1,13 +1,23 @@
 import React, { useState } from "react";
-import HospitalCard, { Hospital } from "../components/Sidebar.tsx";
+import Sidebar from "../Dashboard/Dashboard";
+import HospitalCard from "../../components/Layout/Sections/HospitalCard";
 
-// Import your local images
-import calmetteImg from "../assets/hospitals/calmette.jpg";
-import maxicareImg from "../assets/hospitals/maxicare.jpg";
-import domreyImg from "../assets/hospitals/domrey.jpg";
-import kantha1Img from "../assets/hospitals/kantha1.jpg";
-import kantha2Img from "../assets/hospitals/kantha2.jpg";
-import pediatricImg from "../assets/hospitals/pediatric.jpg";
+
+import calmetteImg from "../../../images/1. Calmette Hospital.png";
+import maxicareImg from "../../../images/3. Maxicare Children Hospital.png";
+import domreyImg from "../../../images/5. Domrey Mother & Child Clinic.png";
+import kantha1Img from "../../../images/4. Kantha Bopha IV Children's Hospital.png";
+import kantha2Img from "../../../images/6. Jayavarman VII Children's Hospital.png";
+import pediatricImg from "../../../images/7. K id Pediatric Clinic.png";
+ 
+export interface Hospital {
+    id: number;
+    name: string;
+    image: string;
+    location: string;
+    distance: string;
+    saved: boolean;
+}
 
 const HospitalFinderPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -80,25 +90,31 @@ const HospitalFinderPage: React.FC = () => {
     );
 
     return (
-        <div className="p-8">
-            <h1 className="text-4xl font-bold mb-6">Hospital Finder</h1>
+        <div className="flex">
+            {/* Sidebar Section */}
+            <Sidebar />
 
-            <input
-                type="text"
-                placeholder="Search hospitals..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-3 mb-6 border rounded-lg"
-            />
+            {/* Main Content */}
+            <div className="p-8 w-full">
+                <h1 className="text-4xl font-bold mb-6">Hospital Finder</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredHospitals.map((hospital) => (
-                    <HospitalCard
-                        key={hospital.id}
-                        hospital={hospital}
-                        onToggleSave={toggleSave}
-                    />
-                ))}
+                <input
+                    type="text"
+                    placeholder="Search hospitals..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full p-3 mb-6 border rounded-lg"
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredHospitals.map((hospital) => (
+                        <HospitalCard
+                            key={hospital.id}
+                            hospital={hospital}
+                            onToggleSave={toggleSave}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
