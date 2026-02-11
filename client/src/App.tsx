@@ -12,45 +12,39 @@ import Verify from './pages/Auth/Otpverify';
 import CreateArticle from './pages/Admin/Create_article';
 import ArticlePage from './pages/Article/Articles';
 import ArticleDetail from './pages/Article/ArticleDetail';
+import MainLayout from './components/Layout/MainLayout'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 function AppContent() {
-  const location = useLocation();
-
-  const hideLayout = ['/login', '/signup', '/Dashboard', '/verify'].includes(location.pathname);
-
   return (
-    <>
-      {/* Show Navbar only if hideLayout is false */}
-      {!hideLayout && <Navbar />}
-
-      <Routes>
+    <Routes>
+      <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutUsPage />} />
         <Route path="/contact" element={<ContactUs />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path ="/verify" element={<Verify />} />
-        <Route path='/Dashboard' element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        } />
-        <Route path="/articles" element={
-          <ProtectedRoute>
-            <ArticlePage />
-          </ProtectedRoute>
-        } />
-        <Route path="/articles/:id" element={
-          <ProtectedRoute>
-            <ArticleDetail />
-          </ProtectedRoute>
-        } />
-      </Routes>
+      </Route>
 
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/verify" element={<Verify />} />
 
-      {/* Show Footer only if hideLayout is false */}
-      {!hideLayout && <Footer />}
-    </>
+      <Route path='/Dashboard' element={
+        <ProtectedRoute>
+          <DashboardPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/articles" element={
+        <ProtectedRoute>
+          <ArticlePage />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/articles/:id" element={
+        <ProtectedRoute>
+          <ArticleDetail />
+        </ProtectedRoute>
+      } />
+    </Routes>
   );
 }
 
