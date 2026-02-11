@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { signup, login, verifyOtp, googleLogin } = require("../controllers/auth.controller");
-
+const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp } = require("../controllers/auth.controller");
+const { protect } = require("../middlewares/auth.middleware");
 /**
  * @swagger
  * /api/users/signup:
@@ -75,14 +75,14 @@ router.post("/signup", signup);
  *               password: { type: string, example: "123456" }
  *     responses:
  *       200:
- *         description: OTP generated and sent successfully
+ *         description: OTP generated and sent successfullyOTP verified successfully. Cookie 'token' has been set.
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 success: { type: boolean, example: true }
- *                 message: { type: string, example: "OTP sent to your email (check console log)" }
+ *                 message: { type: string, example: "OTP sent to your email" }
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -178,4 +178,68 @@ router.post("/verify-otp", verifyOtp);
  */
 router.post("/google", googleLogin);
 
+/**
+ * @swagger
+ * /api/users/check-auth:
+ *   get:
+ *     summary: Verify if user is logged in via Cookie
+ *     tags:
+ *       - Auth
+ *     responses:
+ *       200:
+ *         description: User is authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Not authorized (Invalid or missing cookie)
+ */
+router.get("/check-auth", protect, checkAuth);
+
+/**
+ * @swagger
+ * /api/users/resend-otp:
+ *   post:
+ *     summary: Resend OTP to user email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: OTP resent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: OTP has been resent to your email
+ *       400:
+ *         description: User not found or already verified
+ *       500:
+ *         description: Server error
+ */
+router.post("/resend-otp", resendOtp);
 module.exports = router;

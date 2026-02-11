@@ -7,12 +7,13 @@ import SignUp from './pages/Auth/Signup';
 import AboutUsPage from './pages/Aboutus/About_us';
 import ContactUs from './pages/Contactus/Contact_us'; 
 import DashboardPage from './pages/Dashboard/Dashboard';
-import CreateArticle from'./pages/Admin/Create_article';
-
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Verify from './pages/Auth/Otpverify';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 function AppContent() {
   const location = useLocation();
 
-  const hideLayout = ['/login', '/signup', '/Dashboard'].includes(location.pathname);
+  const hideLayout = ['/login', '/signup', '/Dashboard', '/verify'].includes(location.pathname);
 
   return (
     <>
@@ -25,8 +26,15 @@ function AppContent() {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path='/Dashboard' element={<DashboardPage />} />
-        <Route path='/CreateArticle' element={<CreateArticle />} />
+        <Route path='/verify' element={<Verify />} />
+        <Route
+          path="/Dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       
       {/* Show Footer only if hideLayout is false */}
@@ -38,7 +46,9 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AppContent />
+      <GoogleOAuthProvider clientId="">
+        <AppContent />
+      </GoogleOAuthProvider>
     </Router>
   );
 }
