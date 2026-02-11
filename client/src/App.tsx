@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage/HomePage';
 import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
 import AboutUsPage from './pages/Aboutus/About_us';
-import ContactUs from './pages/Contactus/Contact_us'; 
+import ContactUs from './pages/Contactus/Contact_us';
 import DashboardPage from './pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Verify from './pages/Auth/Otpverify';
@@ -21,20 +21,33 @@ function AppContent() {
   return (
     <>
       {/* Show Navbar only if hideLayout is false */}
-      {!hideLayout && <Navbar />} 
-      
+      {!hideLayout && <Navbar />}
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutUsPage />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path='/Dashboard' element={<DashboardPage />} />
-        <Route path="/articles" element={<ArticlePage />} /> 
-        <Route path="/articles/:id" element={<ArticleDetail />} />
+        <Route path ="/verify" element={<Verify />} />
+        <Route path='/Dashboard' element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/articles" element={
+          <ProtectedRoute>
+            <ArticlePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/articles/:id" element={
+          <ProtectedRoute>
+            <ArticleDetail />
+          </ProtectedRoute>
+        } />
       </Routes>
 
-      
+
       {/* Show Footer only if hideLayout is false */}
       {!hideLayout && <Footer />}
     </>
