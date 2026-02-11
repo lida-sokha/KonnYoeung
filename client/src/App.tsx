@@ -9,6 +9,7 @@ import ContactUs from './pages/Contactus/Contact_us';
 import DashboardPage from './pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Verify from './pages/Auth/Otpverify';
+import CreateArticle from './pages/Admin/Create_article';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 function AppContent() {
   const location = useLocation();
@@ -35,6 +36,7 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        <Route path="/createArticle" element={<CreateArticle/>} />
       </Routes>
       
       {/* Show Footer only if hideLayout is false */}
