@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Sidebar from "../Dashboard/Dashboard";
 import HospitalCard from "../../components/Layout/Sections/HospitalCard";
+import { Hospital } from "../../types/Hospital";
+
+
 
 
 import calmetteImg from "../../../images/1. Calmette Hospital.png";
@@ -9,15 +12,7 @@ import domreyImg from "../../../images/5. Domrey Mother & Child Clinic.png";
 import kantha1Img from "../../../images/4. Kantha Bopha IV Children's Hospital.png";
 import kantha2Img from "../../../images/6. Jayavarman VII Children's Hospital.png";
 import pediatricImg from "../../../images/7. K id Pediatric Clinic.png";
- 
-export interface Hospital {
-    id: number;
-    name: string;
-    image: string;
-    location: string;
-    distance: string;
-    saved: boolean;
-}
+
 
 const HospitalFinderPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");

@@ -1,5 +1,6 @@
 import React from "react";
-import { Hospital } from "../../../pages/Hospitals/Hospitals";
+import { Hospital } from "../../../types/Hospital";
+
 
 interface Props {
     hospital: Hospital;
