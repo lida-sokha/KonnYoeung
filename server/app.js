@@ -5,6 +5,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const setupSwagger = require("./src/config/swagger.js");
 const userRoutes = require("./src/routes/user.route.js");
+const hospitalRoutes = require("./src/routes/hospital.route.js");
 
 const app = express();
 app.use(cookieParser());
@@ -24,6 +25,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
     // Routes
     app.use("/api/users", userRoutes);
+   app.use('/api/hospitals', hospitalRoutes);
 
     // Root
     app.get("/", (req, res) => {

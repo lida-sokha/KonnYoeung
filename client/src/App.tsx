@@ -14,6 +14,7 @@ import ArticlePage from './pages/Article/Articles';
 import ArticleDetail from './pages/Article/ArticleDetail';
 import MainLayout from './components/Layout/MainLayout';
 import Hospital from './pages/Hospitals/Hospitals';
+import HospitalDetail from './pages/Hospitals/HospitalDetail';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 function AppContent() {
   return (
@@ -27,7 +28,6 @@ function AppContent() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/verify" element={<Verify />} />
-      <Route path='/hospital'element={<Hospital />} />
 
       <Route path='/Dashboard' element={
         <ProtectedRoute>
@@ -46,6 +46,18 @@ function AppContent() {
           <ArticleDetail />
         </ProtectedRoute>
       } />
+
+      <Route path='/hospitals' element={
+        <ProtectedRoute>
+          <Hospital />
+        </ProtectedRoute>
+      } />
+      <Route path="/hospitals/:id" element={
+        <ProtectedRoute>
+          <HospitalDetail />
+        </ProtectedRoute>
+        } />
+
     </Routes>
   );
 }
