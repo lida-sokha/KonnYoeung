@@ -1,16 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Stethoscope, BookOpen, MapPin, Settings } from 'lucide-react';
 
-const Sidebar=() => {
+const Sidebar = () => {
     const location = useLocation();
 
     const menuItems = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/Dashboard' },
-    { name: 'Check symptom', icon: <Stethoscope size={20} />, path: '/symptoms' },
-    { name: 'Articles', icon: <BookOpen size={20} />, path: '/articles' },
-    { name: 'Hospitals Finder', icon: <MapPin size={20} />, path: '/hospitals' },
-    { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
-  ];
+        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/Dashboard' },
+        { name: 'Check symptom', icon: <Stethoscope size={20} />, path: '/symptoms' },
+        { name: 'Articles', icon: <BookOpen size={20} />, path: '/articles' },
+        { name: 'Hospitals Finder', icon: <MapPin size={20} />, path: '/hospitals' },
+        { name: 'Settings', icon: <Settings size={20} />, path: '/settings' },
+    ];
     return (
         //if want to change the x-padding between the sidebar and the content (p-4)
         <div className='flex min-h-full w-64 flex-col bg-[#34AADC] p-4 text-white sticky top-0'>
@@ -23,9 +23,9 @@ const Sidebar=() => {
             <nav className='flex-1 space-y-5'>
                 {menuItems.map((item) => {
                     const isActive = location.pathname === item.path;
-                    return(
-                        <Link key={item.name} 
-                            to={item.path} 
+                    return (
+                        <Link key={item.name}
+                            to={item.path}
                             className={`flex items-center gap-3 py-3 pl-6 rounded-l-full transition-all ${isActive ? 'bg-white text-[#34AADC] font-semibold' : 'text-white hover:bg-white/10'}`}>
                             {item.icon}
                             <span>{item.name}</span>

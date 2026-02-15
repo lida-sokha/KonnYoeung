@@ -1,10 +1,17 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const setupSwagger = require("../server/src/config/swagger");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const setupSwagger = require("./src/config/swagger.js");
 const userRoutes = require("./src/routes/user.route.js");
 
 const app = express();
+app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:5173", 
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB connection
