@@ -57,27 +57,31 @@ exports.login = async (req, res) => {
 
     // 1. Validate User
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+      return res.status(401).json({ success: false, message: "Wrong password" });
     }
 
-    // 2. Generate the OTP ONLY ONCE
-    const currentOtp = generateOTP(); 
+    if (user.isVerified) {
+      const token = jwt.sign(
+        {
+          id: user._id
+        },
+        process.env.JWT_SECRET || "temp_secret",
+        { expiresIn: "1d" }
+      );
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Lax",
+        maxAge: 24 * 60 * 60 * 1000
+      });
 
-    // 3. Update User Object
-    user.otp = currentOtp;
-    user.otpExpires = Date.now() + 600000; // 10 minutes
-
-    // 4. SAVE TO DATABASE (Wait for this to finish)
-    await user.save();
-
-    // 5. SEND EMAIL using the SAME variable
-    const emailText = `Your KonnYoeung verification code is: ${currentOtp}. It expires in 10 minutes.`;
-    await sendEmail(user.email, "Your Login Verification Code", emailText);
-
-    res.status(200).json({ 
-      success: true, 
-      message: "OTP sent to your email!" 
-    });
+      return res.status(200).json({
+        success: true,
+        message: "Login successful",
+        token, 
+        user: { id: user._id, fullName: user.fullName, email: user.email }
+      });
+    }
 
   } catch (err) {
     console.error("LOGIN ERROR:", err);

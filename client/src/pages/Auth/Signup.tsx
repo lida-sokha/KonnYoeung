@@ -39,17 +39,19 @@ export default function SignUp() {
   };
 
   // Common styles for inputs to keep the code clean
-  const inputStyle = `w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 transition-all`;
+  const inputStyle = `w-full rounded-xl border border-gray-200 px-5 py-4 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 transition-all`;
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden">
+    <div className="h-screen w-screen flex overflow-hidden bg-gray-50">
       {/* LEFT SIDE – FORM */}
-      <div className="w-full lg:w-1/2 flex items-start justify-center px-6 bg-white lg:pt-20 pt-20">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-start justify-center px-6 lg:pt-10 pt-16 px-6">
+        <div className="w-full max-w-xl bg-white p-8 lg:p-10 rounded-3xl shadow-2xl shadown-grey-200/50">
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8">
+            <Link to="/" className="flex item-center gap-3">
             <img src="/images/logo1.png" alt="Logo" className="h-10" />
-            <span className="text-2xl font-bold text-sky-500">KonnYoeung</span>
+              <span className="text-2xl font-bold text-sky-500">KonnYoeung</span>
+            </Link>
           </div>
 
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Create Account</h1>
@@ -104,6 +106,16 @@ export default function SignUp() {
             </button>
           </form>
 
+          <div className="relative my-8 text-center">
+            <hr className="border-gray-100" />
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-400 text-sm">or</span>
+          </div>
+
+          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
+            <img src="/images/google_logo.png" className="h-5" alt="Google" />
+            Continue with Google
+          </button>
+
           <p className="text-sm text-center mt-6 text-gray-600">
             Already have an account?{" "}
             <Link to="/login" className="text-sky-500 font-semibold hover:underline">
@@ -113,7 +125,7 @@ export default function SignUp() {
         </div>
       </div>
 
-      <div className="hidden lg:flex w-1/2 items-start justify-center pt-15">
+      <div className="hidden lg:flex w-1/2 items-start justify-center pt-10">
         <img
           src={signupImage}
           alt="Signup"

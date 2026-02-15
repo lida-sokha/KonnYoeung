@@ -1,90 +1,140 @@
-import loginImage from "../../../public/images/Login.png";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import loginImage from "../../../public/images/login-removebg-preview.png";
+import API from "../../services/api";
+import { HiIdentification } from "react-icons/hi";
+import { CgPassword } from "react-icons/cg";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [formData, setFormDate] = useState({
+    identifier: "",
+    password: ""
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormDate({
+      ...formData, [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await API.post("/users/login", {
+        email: formData.identifier,
+        password: formData.password
+      });
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const inputStyle = `w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 transition-all`;
+
   return (
-    <div className="h-screen w-screen flex overflow-hidden bg-white">
+    <div className="h-screen w-screen flex overflow-hidden bg-gray-50">
 
-      <div className="w-full lg:w-1/2 h-full p-12 lg:p-24 flex flex-col justify-center bg-white">
+      {/* LEFT SIDE – FORM */}
+      <div className="w-full lg:w-1/2 flex items-start justify-center px-6 pt-16 lg:pt-10">
+        <div className="w-full max-w-xl bg-white p-8 lg:p-10 rounded-3xl shadow-2xl shadow-gray-200/50">
 
-        <div className="flex items-center gap-3 mb-10 pt-10">
-          <img src="/images/logo1.png" alt="KonnYoeung" className="h-10 w-auto" />
-          <span className="text-2xl font-bold text-sky-500 tracking-tight">
-            KonnYoeung
-          </span>
-        </div>
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-8">
+            <Link to='/' className="flex items-center gap-3">
+            <img src="/images/logo1.png" alt="KonnYoeung" className="h-10 w-auto" />
+            <span className="text-2xl font-bold text-sky-500 tracking-tight">
+              KonnYoeung
+              </span>
+              </Link>
+           </div>
 
-        <h1 className="text-4xl font-bold text-gray-800 mb-8 text-left">Login</h1>
-
-        <div className="space-y-5 max-w-md">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Username or email
-            </label>
-            <input
-              type="text"
-              placeholder="Enter your username or email"
-              className="w-full rounded-xl border border-gray-200 px-4 py-4 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Password
-            </label>
-            <div className="relative">
+          <h1 className="text-3xl font-bold text-gray-800 mb-6">Login</h1>
+          {error && <p className="mb-4 text-sm text-red-500 font-medium bg-red-50 p-3 rounded-lg">{error}</p>}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Username or email
+              </label>
               <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-200 px-4 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-all"
+                type="text"
+                name="identifier"
+                value={formData.identifier}
+                onChange={handleChange}
+                placeholder="Enter your username or email"
+                className={inputStyle}
+                required
               />
             </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                className={inputStyle}
+                required
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <a href="#" className="text-sm text-sky-500 font-semibold hover:underline">
+                Reset your password
+              </a>
+            </div>
+
+            <button className="w-full bg-sky-500 text-white py-3 rounded-xl font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]"
+              type="submit"
+              disabled={loading}
+            >
+              {loading? "Loggin in...": "Login"}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-8 text-center">
+            <hr className="border-gray-100" />
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-400 text-sm">or</span>
           </div>
-        </div>
 
-        <div className="mt-4 text-sm">
-          <span className="text-gray-500">Forgot password? </span>
-          <a href="#" className="text-sky-500 font-semibold hover:underline">
-            Reset your password
-          </a>
-        </div>
-
-        <div className="max-w-md">
-          <button className="mt-10 w-full rounded-xl bg-sky-500 py-4 text-white font-bold text-lg hover:bg-sky-600 transition-all active:scale-[0.98]">
-            Login
-          </button>
-        </div>
-
-        <div className="relative my-8 text-center max-w-md">
-          <hr className="border-gray-100" />
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-400 text-sm">or</span>
-        </div>
-
-        <div className="space-y-3 max-w-md">
-          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium">
+          {/* Social Login */}
+          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
             <img src="/images/google_logo.png" className="h-5" alt="Google" />
             Continue with Google
           </button>
 
+          <p className="mt-10 text-sm text-center text-gray-600">
+            Don’t have account?{" "}
+            <Link to="/signup" className="text-sky-500 font-bold hover:underline">
+              Sign Up
+            </Link>
+          </p>
         </div>
-
-        <p className="mt-10 text-sm text-center max-w-md text-gray-600">
-          Don’t have account?{" "}
-          <a href="/signup" className="text-sky-500 font-bold hover:underline">
-            Sign Up
-          </a>
-        </p>
       </div>
 
-      {/* RIGHT SIDE – IMAGE (Exactly 50%) */}
-      <div
-        className="hidden lg:block lg:w-1/2 h-full"
-        style={{
-          backgroundImage: `url(${loginImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "right",
-          backgroundRepeat: "no-repeat"
-        }}
-      />
+      {/* RIGHT SIDE – IMAGE */}
+      <div className="hidden lg:flex w-1/2 items-start justify-center pt-10">
+        <img
+          src={loginImage}
+          alt="Login Illustration"
+          className="w-4/5 max-w-3xl object-contain"
+        />
+      </div>
     </div>
   );
 }
