@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import Sidebar from "../Dashboard/Dashboard";
 import HospitalCard from "../../components/Layout/Sections/HospitalCard";
-import { Hospital } from "../../types/Hospital";
-
-
-
-
 import calmetteImg from "../../../images/1. Calmette Hospital.png";
 import maxicareImg from "../../../images/3. Maxicare Children Hospital.png";
 import domreyImg from "../../../images/5. Domrey Mother & Child Clinic.png";
@@ -17,7 +12,7 @@ import pediatricImg from "../../../images/7. K id Pediatric Clinic.png";
 const HospitalFinderPage: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState("");
 
-    const [hospitals, setHospitals] = useState<Hospital[]>([
+    const [hospitals, setHospitals] = useState([
         {
             id: 1,
             name: "Calmette Hospital",
@@ -101,15 +96,15 @@ const HospitalFinderPage: React.FC = () => {
                     className="w-full p-3 mb-6 border rounded-lg"
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredHospitals.map((hospital) => (
                         <HospitalCard
-                            key={hospital.id}
-                            hospital={hospital}
-                            onToggleSave={toggleSave}
+                            // key={hospital.id}
+                            // hospital={hospital}
+                            // onToggleSave={toggleSave}
                         />
                     ))}
-                </div>
+                </div> */}
             </div>
         </div>
     );

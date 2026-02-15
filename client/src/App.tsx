@@ -12,7 +12,8 @@ import Verify from './pages/Auth/Otpverify';
 import CreateArticle from './pages/Admin/Create_article';
 import ArticlePage from './pages/Article/Articles';
 import ArticleDetail from './pages/Article/ArticleDetail';
-import MainLayout from './components/Layout/MainLayout'
+import MainLayout from './components/Layout/MainLayout';
+import Hospital from './pages/Hospitals/Hospitals';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 function AppContent() {
   return (
@@ -26,6 +27,7 @@ function AppContent() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/verify" element={<Verify />} />
+      <Route path='/hospital'element={<Hospital />} />
 
       <Route path='/Dashboard' element={
         <ProtectedRoute>

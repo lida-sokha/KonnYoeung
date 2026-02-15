@@ -1,34 +1,38 @@
 import React from "react";
-import { Hospital } from "../../../types/Hospital";
 
 
-interface Props {
-    hospital: Hospital;
-    onToggleSave: (id: number) => void;
+interface hospital {
+    id: number;
+    name: string;
+    image: string;
+    location: string;
+    distance: string;
+    saved: boolean;
+    onToggleSave: IdleDeadline;
 }
 
-const HospitalCard: React.FC<Props> = ({ hospital, onToggleSave }) => {
+const HospitalCard = ({ id, name, image, location, distance, saved}:hospital) => {
     return (
         <div className="border rounded-lg shadow-md overflow-hidden bg-white">
             <img
-                src={hospital.image}
-                alt={hospital.name}
+                src={image}
+                alt={name}
                 className="w-full h-40 object-cover"
             />
 
             <div className="p-4">
-                <h2 className="text-lg font-semibold">{hospital.name}</h2>
+                <h2 className="text-lg font-semibold">{name}</h2>
 
-                <p className="text-sm text-gray-600">{hospital.location}</p>
+                <p className="text-sm text-gray-600">{location}</p>
 
-                <p className="text-sm text-gray-500 mt-1">{hospital.distance}</p>
+                <p className="text-sm text-gray-500 mt-1">{distance}</p>
 
                 <button
-                    onClick={() => onToggleSave(hospital.id)}
-                    className={`mt-3 px-4 py-2 rounded text-white ${hospital.saved ? "bg-red-500" : "bg-blue-500"
+                    onClick={()=>null}
+                    className={`mt-3 px-4 py-2 rounded text-white ${saved ? "bg-red-500" : "bg-blue-500"
                         }`}
                 >
-                    {hospital.saved ? "Unsave" : "Save"}
+                    {saved ? "Unsave" : "Save"}
                 </button>
             </div>
         </div>
