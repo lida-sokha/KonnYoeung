@@ -8,9 +8,6 @@ const userRoutes = require("./src/routes/user.route.js");
 const hospitalRoutes = require("./src/routes/hospital.route.js");
 const articleRoutes = require("./src/routes/article.route.js");
 
-
-const Article = require("./src/models/Article");
-
 const app = express();
 app.use(cookieParser());
 app.use(cors({
