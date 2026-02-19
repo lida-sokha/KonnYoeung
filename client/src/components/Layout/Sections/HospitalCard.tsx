@@ -1,5 +1,3 @@
-import React from "react";
-// Optional: install lucide-react for the icons
 import { MapPin, Navigation, Bookmark } from "lucide-react";
 
 interface HospitalProps {
@@ -11,26 +9,30 @@ interface HospitalProps {
   isSaved?: boolean;
   onSaveToggle?: (id: string) => void;
 }
-
 const HospitalCard = ({
   id,
   name,
-  image,
   address,
   distance,
   isSaved,
   onSaveToggle,
 }: HospitalProps) => {
-  const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=400";
-
+  const getImageUrl = (hospitalId: string) => {
+    const cloudName = "dprsygcvh";
+return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${hospitalId}.jpg`;
+ }
+const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=500";
   return (
-    <div className="bg-white rounded-[24px] shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden max-w-sm flex flex-col relative group">
+    <div className="bg-white rounded-[24px] shadow-smbg-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all overflow-hidden flex flex-col">
       {/* Image Section */}
       <div className="relative h-48 w-full">
         <img
-          src={image || fallbackImage}
+          src={getImageUrl(id)}
           alt={name}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = fallbackImage;
+          }}
         />
       </div>
 
