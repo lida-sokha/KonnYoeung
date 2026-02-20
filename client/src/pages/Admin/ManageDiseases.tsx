@@ -1,54 +1,11 @@
 import { Link } from "react-router-dom";
 import { Edit2 } from "lucide-react";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
-
-interface DiseaseRow {
-  id: string;
-  name: string;
-  category: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const diseases: DiseaseRow[] = [
-  {
-    id: "allergy",
-    name: "Allergy",
-    category: "Infectious Disease",
-    createdAt: "Nov 1, 2025",
-    updatedAt: "Dec 1, 2025",
-  },
-  {
-    id: "malaria",
-    name: "Malaria",
-    category: "Infectious Disease",
-    createdAt: "Oct 20, 2025",
-    updatedAt: "Nov 28, 2025",
-  },
-  {
-    id: "hypertension",
-    name: "Hypertension",
-    category: "Cardiovascular",
-    createdAt: "Jan 2, 2025",
-    updatedAt: "Nov 25, 2025",
-  },
-  {
-    id: "type-2-diabetes",
-    name: "Type 2 Diabetes",
-    category: "Metabolic",
-    createdAt: "Oct 25, 2025",
-    updatedAt: "Nov 20, 2025",
-  },
-  {
-    id: "tuberculosis",
-    name: "Tuberculosis",
-    category: "Infectious Disease",
-    createdAt: "Oct 20, 2025",
-    updatedAt: "Nov 15, 2025",
-  },
-];
+import { useDiseases } from "../../contexts/DiseaseContext";
 
 const ManageDiseases = () => {
+  const { diseases } = useDiseases();
+
   return (
     <DashboardLayout>
       <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-6xl mx-auto">
@@ -105,13 +62,13 @@ const ManageDiseases = () => {
                       {disease.updatedAt}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      <button
-                        type="button"
+                      <Link
+                        to={`/admin/diseases/${disease.id}/edit`}
                         className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:border-blue-400 hover:text-blue-600"
                       >
                         <Edit2 className="mr-1.5 h-4 w-4" />
                         Edit
-                      </button>
+                      </Link>
                     </td>
                     <td className="px-6 py-4 text-right text-sm">
                       <Link
