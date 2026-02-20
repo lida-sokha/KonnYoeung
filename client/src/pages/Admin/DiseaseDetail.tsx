@@ -1,41 +1,12 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
-
-const diseaseContent = {
-  allergy: {
-    name: "Allergy",
-    description:
-      "Allergies occur when the body reacts to substances such as dust, pollen, food, or animal fur. In children, allergies often affect the skin, nose, eyes, or breathing and are usually not serious, but they can be uncomfortable.",
-    severity: "Moderate",
-    summary:
-      "Most mild allergies can be managed at home, but symptoms should be monitored.",
-    commonSymptoms: [
-      "Sneezing or runny nose",
-      "Itchy or watery eyes",
-      "Skin rash or itching",
-      "Mild cough or throat irritation",
-    ],
-    seekCareWhen: [
-      "Symptoms become severe or persistent",
-      "Breathing difficulty occurs",
-      "Swelling of the face, lips, or tongue appears",
-    ],
-    whatToDo: [
-      "Try to identify and avoid possible triggers (dust, pollen, certain foods)",
-      "Keep your child's environment clean and well-ventilated",
-      "Ensure your child gets enough rest and fluids",
-      "Monitor symptoms over time",
-    ],
-  },
-} as const;
+import { useDiseases } from "../../contexts/DiseaseContext";
 
 const DiseaseDetail = () => {
   const { id } = useParams<{ id: string }>();
-
-  const disease =
-    (id && (diseaseContent as Record<string, (typeof diseaseContent)[keyof typeof diseaseContent]>)[id]) ??
-    null;
+  const { getDiseaseById } = useDiseases();
+  const disease = id ? getDiseaseById(id) : null;
 
   if (!disease) {
     return (
@@ -72,6 +43,12 @@ const DiseaseDetail = () => {
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
+          </Link>
+          <Link
+            to={`/admin/diseases/${id}/edit`}
+            className="text-sm font-medium text-[#34AADC] hover:underline"
+          >
+            Edit
           </Link>
         </div>
 
