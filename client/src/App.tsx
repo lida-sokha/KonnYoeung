@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from '../src/components/Layout/Navbar';
 import Footer from '../src/components/Layout/Footer';
 import HomePage from './pages/HomePage/HomePage';
@@ -16,6 +16,10 @@ import MainLayout from './components/Layout/MainLayout';
 import Hospital from './pages/Hospitals/Hospitals';
 import HospitalDetail from './pages/Hospitals/HospitalDetail';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import ManageDiseases from './pages/Admin/ManageDiseases';
+import DiseaseDetail from './pages/Admin/DiseaseDetail';
+import DiseaseEdit from './pages/Admin/DiseaseEdit';
+import { DiseaseProvider } from './contexts/DiseaseContext';
 function AppContent() {
   return (
     <Routes>
@@ -34,6 +38,12 @@ function AppContent() {
           <DashboardPage />
         </ProtectedRoute>
       } />
+
+      <Route path='/admin/diseases' element={<DiseaseProvider><Outlet /></DiseaseProvider>}>
+        <Route index element={<ManageDiseases />} />
+        <Route path=':id' element={<DiseaseDetail />} />
+        <Route path=':id/edit' element={<DiseaseEdit />} />
+      </Route>
 
       <Route path="/articles" element={
         <ProtectedRoute>
