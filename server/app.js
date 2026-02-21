@@ -7,6 +7,7 @@ const setupSwagger = require("./src/config/swagger.js");
 const userRoutes = require("./src/routes/user.route.js");
 const hospitalRoutes = require("./src/routes/hospital.route.js");
 const articleRoutes = require("./src/routes/article.route.js");
+const disease = require("./src/models/Disease");
 
 const app = express();
 app.use(cookieParser());
@@ -20,7 +21,6 @@ app.use(express.json());
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB Atlas Connected");
-
     // Swagger
     setupSwagger(app);
 
