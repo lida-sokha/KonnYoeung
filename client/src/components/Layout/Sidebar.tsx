@@ -1,8 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Stethoscope, BookOpen, MapPin, Settings } from 'lucide-react';
 
 const Sidebar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
 
     const menuItems = [
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/Dashboard' },
@@ -33,12 +34,6 @@ const Sidebar = () => {
                     )
                 })}
             </nav>
-
-            <div className="mt-auto flex items-center gap-3 px-2 mb-20 pt-10 pl-6">
-                <div className="h-12 w-12 rounded-full overflow-hidden border-2 border-white/20">
-                    <img src="/admin-avatar.png" alt="Profile" />
-                </div>
-            </div>
         </div>
     );
 };

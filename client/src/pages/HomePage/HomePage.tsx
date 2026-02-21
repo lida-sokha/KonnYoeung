@@ -1,12 +1,27 @@
-import { TbStethoscope, TbBuildingHospital, TbCheck,} from 'react-icons/tb';
+import { TbStethoscope, TbBuildingHospital, TbCheck, } from 'react-icons/tb';
 import Button from '../../components/ui/Button';
 import StartGrid from '../../components/Layout/Sections/StatsGrid';
 import TrustedGrid from '../../components/Layout/Sections/TrustedDataGrid';
 import ProcessSection from '../../components/Layout/Sections/ProcessSection';
 import ExistsSection from '../../components/Layout/Exists';
 import ParentSaidSection from '../../components/Layout/Parentsaid';
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
+  const handleNavigation = () => {
+  // 1. Check if token exists in localStorage
+  const token = localStorage.getItem("token"); 
+
+  if (token) {
+    // User is verified/logged in
+    navigate("/dashboard");
+  } else {
+    // User is not verified
+    navigate("/login"); // or "/verify"
+  }
+  };
+  
+  const navigate = useNavigate();
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-white to-blue-50/30 flex flex-col">
       
@@ -37,7 +52,7 @@ export default function HomePage() {
             <div className="pt-2 sm:pt-4">
               <Button
                 text='Get Started Now'
-                onClick={() => console.log("button clicked")}
+                onClick={handleNavigation}
                 />
             </div>
 
