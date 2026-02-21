@@ -16,7 +16,7 @@ const Hospital = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null); 
   
-    const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerpage = 6;
 
@@ -50,6 +50,7 @@ const Hospital = () => {
   setSearchTerm(e.target.value);
   setCurrentPage(1); 
   };  
+
   // Helper to generate the Cloudinary URL
   const getImageUrl = (hospitalId: string) => {
   const cloudName = "dprsygcvh";

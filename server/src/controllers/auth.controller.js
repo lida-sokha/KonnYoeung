@@ -213,3 +213,27 @@ exports.resendOtp = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+exports.saveHospital = async (req, res) => {
+  try {
+    const { hospitalId } = req.body;
+    const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    const isAlreadySaved = user.savedHospitals.includes(hospitalId);
+
+    // Toggle logic: If saved -> remove it ($pull), if not -> add it ($addToSet)
+    const update = isAlreadySaved 
+      ? { $pull: { savedHospitals: hospitalId } } 
+      : { $addToSet: { savedHospitals: hospitalId } };
+
+    await User.findByIdAndUpdate(userId, update);
+
+    res.status(200).json({ 
+        success: true, 
+        message: isAlreadySaved ? "Removed" : "Saved" 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

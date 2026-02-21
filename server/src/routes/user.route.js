@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp } = require("../controllers/auth.controller");
+const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp, saveHospital } = require("../controllers/auth.controller");
 const { protect } = require("../middlewares/auth.middleware");
 /**
  * @swagger
@@ -242,4 +242,7 @@ router.get("/check-auth", protect, checkAuth);
  *         description: Server error
  */
 router.post("/resend-otp", resendOtp);
+
+router.post('/save', protect, saveHospital);
+
 module.exports = router;

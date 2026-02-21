@@ -1,4 +1,6 @@
 import { MapPin, Navigation, Bookmark } from "lucide-react";
+import API from '../../../services/api';
+import { useEffect } from "react";
 
 interface HospitalProps {
   id: string;
@@ -20,8 +22,24 @@ const HospitalCard = ({
   const getImageUrl = (hospitalId: string) => {
     const cloudName = "dprsygcvh";
 return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${hospitalId}.jpg`;
- }
-const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=500";
+  }
+  const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=500";
+  
+const handleSaveToggle = async (hospitalId: string) => {
+  try {
+    const response = await API.post("/hospitals/save", { hospitalId });
+
+    if (response.status === 200) {
+      // If you didn't do it optimistically, do it now:
+      if (onSaveToggle) onSaveToggle(hospitalId);
+    }
+  } catch (error: any) {
+    console.error("Save Error:", error.response?.data || error.message);
+    alert("Authentication failed or server error. Please log in again.");
+    
+  }
+};
+  
   return (
     <div className="bg-white rounded-[24px] shadow-smbg-white shadow-sm hover:shadow-md hover:-translate-y-1 transition-all overflow-hidden flex flex-col">
       {/* Image Section */}
@@ -59,15 +77,15 @@ const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6f
 
           {/* Minimalist Save Button (Bookmark Icon) */}
           <button
-            onClick={() => onSaveToggle && onSaveToggle(id)}
-            className="p-2 transition-transform active:scale-90"
-          >
-            <Bookmark
-              size={24}
-              fill={isSaved ? "currentColor" : "none"}
-              className={isSaved ? "text-gray-900" : "text-gray-400"}
-            />
-          </button>
+        onClick={() => handleSaveToggle(id)} 
+        className="p-2 transition-transform active:scale-90"
+      >
+        <Bookmark
+          size={24}
+          fill={isSaved ? "currentColor" : "none"}
+          className={isSaved ? "text-gray-900" : "text-gray-400"}
+        />
+      </button>
         </div>
       </div>
     </div>
