@@ -7,8 +7,6 @@ const Settings = () => {
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [language, setLanguage] = useState("en");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
 
     // 1. Fetch User Data on Load
     useEffect(() => {
