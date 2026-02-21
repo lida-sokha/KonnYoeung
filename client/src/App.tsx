@@ -15,6 +15,8 @@ import ArticleDetail from './pages/Article/ArticleDetail';
 import MainLayout from './components/Layout/MainLayout';
 import Hospital from './pages/Hospitals/Hospitals';
 import HospitalDetail from './pages/Hospitals/HospitalDetail';
+import CheckSymptoms from './pages/Symptoms/CheckSymptoms';
+import SymptomStart from './pages/Symptoms/SymptomStart';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import ManageDiseases from './pages/Admin/ManageDiseases';
 import DiseaseDetail from './pages/Admin/DiseaseDetail';
@@ -36,6 +38,17 @@ function AppContent() {
       <Route path='/Dashboard' element={
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>
+      } />
+
+      <Route path='/symptoms' element={
+        <ProtectedRoute>
+          <CheckSymptoms />
+        </ProtectedRoute>
+      } />
+      <Route path='/symptoms/start' element={
+        <ProtectedRoute>
+          <SymptomStart />
         </ProtectedRoute>
       } />
 
