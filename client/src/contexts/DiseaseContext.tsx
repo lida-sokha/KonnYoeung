@@ -14,7 +14,7 @@ export interface Disease {
   whatToDo: string[];
 }
 
-const initialDiseases: Disease[] = [
+export const initialDiseases: Disease[] = [
   {
     id: "allergy",
     name: "Allergy",
