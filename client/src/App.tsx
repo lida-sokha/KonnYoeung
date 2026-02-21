@@ -20,7 +20,7 @@ import ManageDiseases from './pages/Admin/ManageDiseases';
 import DiseaseDetail from './pages/Admin/DiseaseDetail';
 import DiseaseEdit from './pages/Admin/DiseaseEdit';
 import { DiseaseProvider } from './contexts/DiseaseContext';
-import Settings from './pages/Setting/Setting';
+import Settings from './pages/Settingpage/Setting';
 function AppContent() {
   return (
     <Routes>
@@ -70,8 +70,10 @@ function AppContent() {
         } />
       
       <Route
-        path="/settings"element={
+        path="/settings" element={
+          <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
         }
       />
 
