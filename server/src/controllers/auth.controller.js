@@ -172,18 +172,24 @@ exports.googleLogin = async (req, res) => {
 };
 
 // --- Add this at the very end of auth.controller.js ---
-
 exports.checkAuth = async (req, res) => {
   try {
-    // req.user is already verified and attached by the 'protect' middleware
+    // req.user usually only contains the ID from the JWT token
+    // We need to find the full user in the database
+    const user = await User.findById(req.user.id).select("-password"); // Exclude password for security
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
     res.status(200).json({
       success: true,
-      user: req.user
+      user: user // Now this contains email, fullName, etc.
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Server Error in checkAuth: " + error.message
+      message: "Server Error: " + error.message
     });
   }
 };
@@ -232,6 +238,31 @@ exports.saveHospital = async (req, res) => {
     res.status(200).json({ 
         success: true, 
         message: isAlreadySaved ? "Removed" : "Saved" 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { fullName, email, language, newPassword } = req.body;
+    const userId = req.user.id;
+
+    const updateData = { fullName, email, language };
+
+    // If the user is trying to change their password
+    if (newPassword) {
+      const bcrypt = require('bcrypt');
+      updateData.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -1,129 +1,154 @@
-import { useState } from "react";
-import { Camera } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Lock } from "lucide-react"; // Added Lock icon for style
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import API from "../../services/api"; 
 
 const Settings = () => {
+    const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [language, setLanguage] = useState("");
+    const [language, setLanguage] = useState("en");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleSave = () => {
-        console.log({
-            email,
-            password,
-            language,
-            newPassword,
-            confirmPassword,
-        });
-        alert("Changes saved!");
-    };
+    // 1. Fetch User Data on Load
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await API.get("/users/check-auth");
+                if (response.data.success) {
+                    // Fill both Name and Email from backend
+                    setFullName(response.data.user.fullName || "");
+                    setEmail(response.data.user.email || "");
+                    setLanguage(response.data.user.language || "en");
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    // Inside your Settings component...
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await API.get("/users/check-auth");
+                
+                if (response.data.success && response.data.user) {
+                    setEmail(response.data.user.email); 
+                }
+            } catch (error) {
+                console.error("Failed to fetch email from database:", error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     const handleLogout = () => {
-        console.log("User logged out");
-        alert("Logged out!");
+        localStorage.removeItem("token");
+        window.location.href = "/";
     };
 
     return (
         <DashboardLayout>
-            {/* HEADER */}
             <div className="text-center mt-6 space-y-2">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-                    Profile Settings
-                </h1>
-                <p className="text-gray-500">
-                    Manage your account information
+                <h1 className="text-3xl font-bold text-gray-800">Profile Settings</h1>
+                <p className="text-gray-500">Manage your account information</p>
+            </div>
+
+            <div className="max-w-2xl mx-auto mt-10 space-y-6 px-6">
+                {/* FULL NAME */}
+                <div>
+                <label className="block text-gray-600 mb-2 font-medium">Full Name</label>
+                <div className="relative">
+                        {/* Styled as a display box instead of an editable field */}
+                        <div className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-gray-600 font-medium">
+                            {fullName || "Loading..."}
+                        </div>
+                        
+                        {/* Subtle lock icon to signal it's permanent */}
+                        <div className="absolute right-4 top-3.5">
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="16" height="16" 
+                                viewBox="0 0 24 24" fill="none" 
+                                stroke="currentColor" strokeWidth="2" 
+                                strokeLinecap="round" strokeLinejoin="round" 
+                                className="text-gray-300"
+                            >
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </div>
+                    </div>
+                <p className="mt-1 text-xs text-gray-400">
+                    Legal name as registered during account creation.
                 </p>
             </div>
-
-            {/* PROFILE IMAGE */}
-            <div className="flex justify-center mt-8">
-                <div className="relative">
-                    <img
-                        src="https://via.placeholder.com/150"
-                        className="w-28 h-28 rounded-full object-cover border shadow"
-                    />
-
-                    {/* CAMERA ICON BUTTON */}
-                    <button className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow hover:bg-gray-100 transition">
-                        <Camera className="w-4 h-4 text-gray-600" />
-                    </button>
-                </div>
-            </div>
-
-            {/* FORM */}
-            <div className="max-w-2xl mx-auto mt-10 space-y-6 px-6">
-
-                {/* EMAIL */}
+                {/* EMAIL (READ ONLY) */}
                 <div>
-                    <label className="block text-gray-600 mb-2">Email</label>
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                </div>
-
-                {/* CURRENT PASSWORD */}
-                <div>
-                    <label className="block text-gray-600 mb-2">Current Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter current password"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                </div>
-
+                    <label className="block text-gray-600 mb-2 font-medium">Registered Email</label>
+                    <div className="relative">
+                        <div className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-gray-600 font-medium">
+                        {email || "Loading email..."}
+                        </div>
+                        
+                        <div className="absolute right-4 top-3.5 flex items-center gap-2">
+                        <span className="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">VERIFIED</span>
+                        <Lock className="w-4 h-4 text-gray-300" />
+                        </div>
+                    </div>
+                    <p className="mt-1 text-xs text-gray-400">
+                        This email is securely linked to your account.
+                    </p>
+                    </div>
                 {/* LANGUAGE */}
-                <div>
-                    <label className="block text-gray-600 mb-2">Language</label>
-                    <select
-                        value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    >
-                        <option value="">Select Language</option>
-                        <option value="en">English</option>
-                        <option value="kh">Khmer</option>
+               <div>
+        <label className="block text-gray-600 mb-2 font-medium">Preferred Language</label>
+        <div className="relative group">
+            <select
+             value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+                className="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-white text-gray-700 
+                    appearance-none cursor-pointer outline-none transition-all
+                    focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 
+                    hover:border--300 pr-12 font-medium"
+                >
+                    <option value="" disabled className="text-gray-400">
+                        Select your language...
+                    </option>
+                    
+                    <option value="en" className="py-2 ">
+                        English 
+                    </option>
+                    
+                    <option value="kh" className="py-2">
+                        Khmer 
+                    </option>
                     </select>
+
+                    {/* Custom Arrow Icon (Replacing the default browser arrow) */}
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="18" height="18" 
+                        viewBox="0 0 24 24" fill="none" 
+                        stroke="currentColor" strokeWidth="2" 
+                        strokeLinecap="round" strokeLinejoin="round"
+                    >
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
+                    </div>
+                </div>
+                <p className="mt-1 text-xs text-gray-400">
+                    This will update the app interface to your choice.
+                </p>
                 </div>
 
-                {/* CHANGE PASSWORD */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="New Password"
-                        className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                    <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm Password"
-                        className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                </div>
-
-                {/* ACTION BUTTONS */}
+                {/* ACTIONS */}
                 <div className="flex justify-between items-center pt-6">
-                    <button
-                        onClick={handleSave}
-                        className="px-6 py-3 rounded-xl bg-blue-500 text-white hover:bg-blue-600 transition"
-                    >
-                        Save Changes
-                    </button>
-
-                    <button
-                        onClick={handleLogout}
-                        className="px-6 py-3 rounded-xl bg-red-500 text-white hover:bg-red-600 transition"
-                    >
+                    
+                    <button onClick={handleLogout} className="px-8 py-3 rounded-xl bg-red-50 text-red-500 font-semibold hover:bg-red-100 transition">
                         Log Out
                     </button>
                 </div>
