@@ -19,6 +19,38 @@ const Hospital = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerpage = 6;
+  const [savedIds, setSavedIds] = useState<string[]>([]); 
+
+  useEffect(() => {
+    const fetchHospitalData = async () => {
+      try {
+        // 1. Fetch all hospitals
+        const hospitalRes = await API.get("/hospitals");
+        
+        // 2. Fetch user's saved hospitals to mark them
+        const userRes = await API.get("users/check-auth");
+        
+        if (userRes.data.success) {
+          // Store only the IDs for quick comparison
+          const ids = userRes.data.user.savedHospitals.map((h: any) => h._id || h);
+          setSavedIds(ids);
+        }
+        
+        setHospitals(hospitalRes.data);
+      } catch (err: any) {
+        setError("The server encountered an error.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchHospitalData();
+  }, []);
+
+  const handleSaveToggle = (id: string) => {
+    setSavedIds((prev) => 
+      prev.includes(id) ? prev.filter(savedId => savedId !== id) : [...prev, id]
+    );
+  };
 
     useEffect(() => {
         const fetchHospital = async () => {
@@ -92,15 +124,16 @@ const Hospital = () => {
         <div className="container mx-auto p-6">
         {filteredHospital.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentHospitals.map((hospital) => (
-            <Link key={hospital._id} to={`/hospitals/${hospital._id}`}>
+            {currentHospitals.map((hospital) => (
               <HospitalCard
-                id={hospital._id}
-                name={hospital.name}
-                address={hospital.address}
-                image={getImageUrl(hospital._id)}
-              />
-            </Link>
+              key={hospital._id}
+              id={hospital._id}
+              name={hospital.name}
+              address={hospital.address}
+              image={getImageUrl(hospital._id)}
+              isSaved={savedIds.includes(hospital._id)} 
+              onSaveToggle={handleSaveToggle}
+                />
           ))}
         </div>
           

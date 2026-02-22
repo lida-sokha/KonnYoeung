@@ -174,9 +174,7 @@ exports.googleLogin = async (req, res) => {
 // --- Add this at the very end of auth.controller.js ---
 exports.checkAuth = async (req, res) => {
   try {
-    // req.user usually only contains the ID from the JWT token
-    // We need to find the full user in the database
-    const user = await User.findById(req.user.id).select("-password"); // Exclude password for security
+    const user = await User.findById(req.user.id).select("-password").populate('savedHospitals');; 
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -226,9 +224,9 @@ exports.saveHospital = async (req, res) => {
     const userId = req.user.id;
 
     const user = await User.findById(userId);
-    const isAlreadySaved = user.savedHospitals.includes(hospitalId);
+    
+    const isAlreadySaved = user.savedHospitals.some(id => id.toString() === hospitalId);
 
-    // Toggle logic: If saved -> remove it ($pull), if not -> add it ($addToSet)
     const update = isAlreadySaved 
       ? { $pull: { savedHospitals: hospitalId } } 
       : { $addToSet: { savedHospitals: hospitalId } };

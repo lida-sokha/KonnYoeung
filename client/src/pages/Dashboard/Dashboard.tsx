@@ -1,10 +1,36 @@
+import { useState, useEffect } from "react"; 
+import API from '../../services/api'; 
+import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/Layout/Sections/DashboardLayout';
 import { 
   Clock, Lightbulb, Bookmark, BookOpen, 
   Hospital, ChevronRight, Heart, Activity 
 } from 'lucide-react';
 
+interface HospitalData {
+  _id: string;
+  name: string;
+  address: string;
+}
 const DashboardPage = () => {
+  const [savedHospitals, setSavedHospitals] = useState<HospitalData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await API.get("users/check-auth");
+        if (response.data.success) {
+          setSavedHospitals(response.data.user.savedHospitals || []);
+        }
+      } catch (err) {
+        console.error("Error fetching saved hospitals ", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
@@ -46,22 +72,48 @@ const DashboardPage = () => {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Saved Hospital */}
-            <div className="space-y-4">
+            <div className="space-y-1">
               <div className="bg-[#FFD700] p-4 rounded-t-2xl text-white flex items-center gap-2 font-bold">
                 <Bookmark size={20} fill="white" />
-                Saved Hospital
+                Saved Hospital ({savedHospitals.length})
               </div>
-              <div className="p-4 border border-gray-100 rounded-b-2xl bg-white shadow-sm">
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-100 p-2 rounded-lg text-blue-600">
-                    <Hospital size={24} />
+              <div className="p-4 border border-gray-100 rounded-b-2xl bg-white shadow-sm space-y-4">
+              {loading ? (
+                <p className="text-xs text-gray-400 animate-pulse">Loading your bookmarks...</p>
+              ) : savedHospitals.length > 0 ? (
+                savedHospitals.map((hospital) => (
+                  <div 
+                    key={hospital._id} 
+                    className="flex items-center gap-3 border-b border-gray-50 pb-3 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors p-1 rounded-lg"
+                  >
+                    {/* Icon Container */}
+                    <div className="bg-blue-30 p-2.5 rounded-xl text-blue-500 shrink-0">
+                      <Hospital size={20} />
+                    </div>
+
+                    {/* Text Content */}
+                    <Link 
+                        {...({ to: `/hospitals/${hospital._id}` } as any)}
+                        className="flex-1 min-w-0 hover:opacity-70 transition-opacity"
+                      >
+                      <div>
+                        <h4 className="font-bold text-sm text-gray-900 truncate">
+                          {hospital.name}
+                        </h4>
+                        <p className="text-[11px] text-gray-500 truncate">
+                          {hospital.address}
+                        </p>
+                      </div>
+                    </Link>
+                      <ChevronRight size={14} className="text-gray-300" />
                   </div>
-                  <div>
-                    <h4 className="font-bold">Calmette Hospital</h4>
-                    <p className="text-xs text-gray-500">Phnom Penh • 1 km from you</p>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-xs text-gray-400">No hospitals saved yet.</p>
                 </div>
-              </div>
+              )}
+            </div>
             </div>
 
             {/* Tips for Parents */}
