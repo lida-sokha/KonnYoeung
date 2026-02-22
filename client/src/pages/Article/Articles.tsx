@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
 import API from "../../services/api"; 
 import { Search, Mic, ThumbsUp, ThumbsDown, Bookmark, ArrowRight } from "lucide-react";
+import Button from "../../components/ui/Button";
 
 interface ContentBlock {
   content_order: number;
@@ -19,6 +20,8 @@ interface Article {
   publish_date: string;
   categories: string[];
   content_blocks: ContentBlock[]; 
+  isSaved?: boolean;
+  onSaveToggle?: (id: String) => void;
 }
 
 const ArticlePage = () => {
@@ -35,8 +38,20 @@ const ArticlePage = () => {
     const fetchArticles = async () => {
       try {
         setLoading(true);
-        const response = await API.get("/articles");
-        setArticles(response.data);
+        const [articlesRes, userRes] = await Promise.all([
+        API.get("/articles"),
+        API.get("/users/check-auth")
+        ]);
+        const fetchedArticles = articlesRes.data;
+        const savedArticleIds = userRes.data.user.savedArticles || [];
+
+        const syncedArticles = fetchedArticles.map((art: Article) => ({
+        ...art,
+        isSaved: savedArticleIds.some((saved: any) => 
+          (typeof saved === 'string' ? saved : saved._id) === art._id
+        )
+      }));
+        setArticles(syncedArticles);
       } catch (error) {
         console.error("Error fetching articles:", error);
       } finally {
@@ -70,6 +85,24 @@ const filteredArticles = activeTab === "All"
       console.log("Sample Article Categories:", articles[0].categories);
     }
   }, [activeTab, articles]);
+
+const handleSaveToggle = async (articleId: string) => {
+  try {
+    const response = await API.post("/users/saveArticle", { articleId }); 
+    
+    if (response.status === 200) {
+      setArticles((prevArticles) =>
+        prevArticles.map((art) =>
+          art._id === articleId 
+            ? { ...art, isSaved: response.data.message === "Saved" } 
+            : art
+        )
+      );
+    }
+  } catch (error) {
+    console.error("Toggle error:", error);
+  }
+};
 
   return (
     <DashboardLayout>
@@ -142,10 +175,39 @@ const filteredArticles = activeTab === "All"
 
                         <div className="mt-auto pt-4 flex justify-between items-center border-t border-gray-50 mt-4">
                           <div className="flex items-center gap-3 text-gray-400 text-[10px]">
-                            <span className="flex items-center gap-1"><ThumbsUp size={12} /> 1.2k</span>
-                            <span className="flex items-center gap-1"><ThumbsDown size={12} /></span>
+                            {/* <span className="flex items-center gap-1"><ThumbsUp size={16} /> 1.2k</span> */}
+                            <button 
+                            className={`flex items-center gap-1 transition-all active:scale-90 ${
+                              art.isSaved 
+                                ? "text-blue-600" 
+                                : "text-gray-400 hover:text-blue-500"
+                            }`}
+                            onClick={(e) => {
+                              e.stopPropagation(); 
+                              handleSaveToggle(art._id);
+                            }}
+                          >
+                            <ThumbsUp 
+                            size={20} 
+                            // 1. "fill" handles the inside of the thumb
+                            fill={art.isSaved ? "currentColor" : "none"} 
+                            className={`transition-all duration-300 ${
+                              art.isSaved 
+                                ? "text-blue-600"  // 2. Turns the stroke and fill blue when saved
+                                : "text-gray-400"  // 3. Keeps it gray when not saved
+                            }`}
+                          />
+                          </button>
+                            <button 
+                              className="flex item-center gap-1 hover:text-blue-500 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                console.log("Disliked");
+                              }}
+                            >
+                              <ThumbsDown size={20} />
+                            </button>
                           </div>
-                          <Bookmark size={16} className="text-gray-300 hover:text-blue-500 transition-colors" />
                         </div>
                       </div>
                     </div>

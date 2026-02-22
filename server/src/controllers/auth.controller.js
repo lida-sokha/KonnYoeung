@@ -174,7 +174,7 @@ exports.googleLogin = async (req, res) => {
 // --- Add this at the very end of auth.controller.js ---
 exports.checkAuth = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password").populate('savedHospitals');; 
+    const user = await User.findById(req.user.id).select("-password").populate('savedHospitals').populate("savedArticles"); 
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -241,6 +241,27 @@ exports.saveHospital = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+exports.SaveArticle = async (req, res) => {
+  try {
+    const { articleId } = req.body;
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+    const isAlreadySaved = user.savedArticles.some(id => id.toString() === articleId);
+
+   const update = isAlreadySaved 
+      ? { $pull: { savedArticles: articleId } } 
+      : { $addToSet: { savedArticles: articleId } };
+    
+    await User.findByIdAndUpdate(userId, update); 
+    res.status(200).json({
+      success: true,
+      message: isAlreadySaved ? "Removed" : "Saved"
+    })
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
 
 exports.updateProfile = async (req, res) => {
   try {
