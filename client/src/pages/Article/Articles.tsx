@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
 import API from "../../services/api"; 
-import { Search, Mic, ThumbsUp, ThumbsDown, Bookmark, ArrowRight } from "lucide-react";
-import Button from "../../components/ui/Button";
+import { Search, Mic, ThumbsUp, ThumbsDown, ArrowRight } from "lucide-react";
 
 interface ContentBlock {
   content_order: number;

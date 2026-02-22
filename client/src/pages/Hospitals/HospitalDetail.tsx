@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../../services/api";
-import { MapPin, Phone, Clock, Mail, Globe, Share2, MessageCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import {  Mail, MessageCircle, ArrowRight } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';

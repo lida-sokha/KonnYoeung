@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Search, ArrowRight } from "lucide-react";
 import API from "../../services/api";
 import HospitalCard from "../../components/Layout/Sections/HospitalCard";
