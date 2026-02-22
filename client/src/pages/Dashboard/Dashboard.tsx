@@ -12,8 +12,13 @@ interface HospitalData {
   name: string;
   address: string;
 }
+interface ArticlDatea {
+  article_ID: string;
+  article_title : String;
+}
 const DashboardPage = () => {
   const [savedHospitals, setSavedHospitals] = useState<HospitalData[]>([]);
+  const [savedArticles, setSavedArticles] = useState<ArticlDatea[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,6 +27,7 @@ const DashboardPage = () => {
         const response = await API.get("users/check-auth");
         if (response.data.success) {
           setSavedHospitals(response.data.user.savedHospitals || []);
+          setSavedArticles(response.data.user.savedArticles || []);
         }
       } catch (err) {
         console.error("Error fetching saved hospitals ", err);
@@ -63,8 +69,31 @@ const DashboardPage = () => {
               </div>
               <div className="p-4 space-y-4">
                  <h3 className="font-bold text-gray-700">Health Insights</h3>
-                 <InsightItem title="Managing Diabetes Through Diet" category="Metabolic" readTime="8 min read" />
-                 <InsightItem title="Heart Health and Exercise" category="Cardiovascular" readTime="6 min read" />
+                {loading ? (
+                  <p className="text-xs text-gray-400 animate-pulse">Loading your liked Article</p>
+                ) : savedArticles.length > 0 ? (
+                      savedArticles.map((article) => (
+                        <div key={article.article_ID}
+                          className="flex items-center gap-3 border-b border-gray-50 pb-3 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors p-1 rounded-lg"
+                        >
+
+                          <Link to={`/articles/${article.article_ID}`}
+                            className="flex-1 min-w-0 hover:opacity-70 transition-opacity">
+                            <div>
+                              <h3 className="text-m text-gray-900 truncate">
+                                {article.article_title}
+                              </h3>
+                            </div>
+                          </Link>
+                          <ChevronRight size={14} className="text-gray-300" />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4">
+                        <p className="text-xs text-gray-400">No article liked yet.</p>
+                      </div>
+                )
+                 }
               </div>
             </div>
           </div>
@@ -87,9 +116,9 @@ const DashboardPage = () => {
                     className="flex items-center gap-3 border-b border-gray-50 pb-3 last:border-0 last:pb-0 hover:bg-gray-50 transition-colors p-1 rounded-lg"
                   >
                     {/* Icon Container */}
-                    <div className="bg-blue-30 p-2.5 rounded-xl text-blue-500 shrink-0">
-                      <Hospital size={20} />
-                    </div>
+                    <div className="bg-gray-100 p-2.5 text-blue-500 shrink-0 rounded-2xl border border-gray-100">
+                        <Hospital size={20} className="text-blue-500" />
+                      </div>
 
                     {/* Text Content */}
                      <Link to={`/hospitals/${hospital._id}`}

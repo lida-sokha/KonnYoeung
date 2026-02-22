@@ -36,7 +36,11 @@ const userSchema = new mongoose.Schema(
     savedHospitals: [{ 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Hospital'
-}]
+    }],
+    savedArticles: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Article'
+    }]
   },
   {
     timestamps: true 

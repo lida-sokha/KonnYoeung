@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp, saveHospital } = require("../controllers/auth.controller");
+const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp, saveHospital, SaveArticle } = require("../controllers/auth.controller");
 const { protect } = require("../middlewares/auth.middleware");
 /**
  * @swagger
@@ -244,5 +244,7 @@ router.get("/check-auth", protect, checkAuth);
 router.post("/resend-otp", resendOtp);
 
 router.post('/save', protect, saveHospital);
+
+router.post('/saveArticle', protect, SaveArticle);
 
 module.exports = router;
