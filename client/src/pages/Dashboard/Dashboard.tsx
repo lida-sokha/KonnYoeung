@@ -92,8 +92,7 @@ const DashboardPage = () => {
                     </div>
 
                     {/* Text Content */}
-                    <Link 
-                        {...({ to: `/hospitals/${hospital._id}` } as any)}
+                     <Link to={`/hospitals/${hospital._id}`}
                         className="flex-1 min-w-0 hover:opacity-70 transition-opacity"
                       >
                       <div>
