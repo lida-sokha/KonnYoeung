@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
-import Navbar from '../src/components/Layout/Navbar';
-import Footer from '../src/components/Layout/Footer';
 import HomePage from './pages/HomePage/HomePage';
 import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
@@ -18,9 +16,6 @@ import CheckSymptoms from './pages/Symptoms/CheckSymptoms';
 import SymptomStart from './pages/Symptoms/SymptomStart';
 import SymptomResult from './pages/Symptoms/SymptomResult';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import ManageDiseases from './pages/Admin/ManageDiseases';
-import DiseaseDetail from './pages/Admin/DiseaseDetail';
-import DiseaseEdit from './pages/Admin/DiseaseEdit';
 import { DiseaseProvider } from './contexts/DiseaseContext';
 import Settings from './pages/Settingpage/Setting';
 
@@ -28,6 +23,10 @@ import Settings from './pages/Settingpage/Setting';
 import AdminRoute from './components/auth/AdminRoute'; 
 import AdminDashboard from './pages/Admin/AdminDashboard/AdminDashboard';
 import CreateArticle from './pages/Admin/Create_article';
+import DiseaseDetail from './pages/Admin/DiseaseDetail';
+import DiseaseEdit from './pages/Admin/DiseaseEdit';
+import ManageDiseases from './pages/Admin/ManageDiseases';
+import ManageUsers from './pages/Admin/ManageUser';
 
 function AppContent() {
   return (
@@ -110,6 +109,15 @@ function AppContent() {
         element={<AdminRoute><AdminDashboard /></AdminRoute>} 
       />
 
+      <Route
+        path='/admin/all-users'
+        element={
+          <AdminRoute>
+            <ManageUsers />
+        </AdminRoute>
+      }
+      />
+      
       {/* Disease Management Group */}
       <Route 
         path='/admin/diseases' 
