@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
 
 const CreateArticle = () => {
   const [title, setTitle] = useState("");
@@ -42,7 +42,7 @@ const CreateArticle = () => {
   };
 
   return (
-    <DashboardLayout>
+    <AdminDashboardLayout>
       <div className="px-10 pb-10 pt-2">
         <h1 className="text-3xl font-bold mb-8">Create New Article</h1>
 
@@ -223,7 +223,7 @@ const CreateArticle = () => {
           </button>
         </div>
       </div>
-    </DashboardLayout>
+    </AdminDashboardLayout>
   );
 };
 

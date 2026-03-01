@@ -60,10 +60,16 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, message: "Wrong password" });
     }
 
+    if (!user.isVerified) {
+      return res.status(403).json({ success: false, message: "Please verify your email first" });
+    }
+    const isAdmin = user.role === "admin";
+
     if (user.isVerified) {
       const token = jwt.sign(
         {
-          id: user._id
+          id: user._id,
+          role: user.role
         },
         process.env.JWT_SECRET || "temp_secret",
         { expiresIn: "1d" }
@@ -77,9 +83,9 @@ exports.login = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: "Login successful",
+        message: isAdmin ? "Admin login successful" : "Login successful",
         token, 
-        user: { id: user._id, fullName: user.fullName, email: user.email }
+        user: { id: user._id, fullName: user.fullName, email: user.email , role:user.role}
       });
     }
 

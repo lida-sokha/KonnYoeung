@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
 import { Edit2 } from "lucide-react";
-import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
 import { useDiseases } from "../../contexts/DiseaseContext";
 
 const ManageDiseases = () => {
   const { diseases } = useDiseases();
 
   return (
-    <DashboardLayout>
+    <AdminDashboardLayout>
       <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-6xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-800">
@@ -85,7 +85,7 @@ const ManageDiseases = () => {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </AdminDashboardLayout>
   );
 };
 

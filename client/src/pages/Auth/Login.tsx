@@ -2,8 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import loginImage from "../../../public/images/login-removebg-preview.png";
 import API from "../../services/api";
-import { HiIdentification } from "react-icons/hi";
-import { CgPassword } from "react-icons/cg";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,6 +12,7 @@ export default function Login() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormDate({
@@ -25,6 +25,11 @@ export default function Login() {
     setError("");
     setLoading(true);
 
+    if (!formData.identifier || formData.password.length < 6) {
+      setError("Please enter valid password.");
+      return;
+    }
+
     try {
       const response = await API.post("/users/login", {
         email: formData.identifier,
@@ -32,10 +37,16 @@ export default function Login() {
       });
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
-        navigate("/dashboard");
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        const userRole = response.data.user.role;
+        navigate(userRole === "admin" ? "/admin/dashboard" : "/dashboard", { replace: true });
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed.");
+      // Avoid leaking specific server details; use generic but helpful messages
+      const message = err.response?.status === 401 
+        ? "Invalid email or password." 
+        : "An error occurred. Please try again later.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -64,16 +75,17 @@ export default function Login() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Username or email
+                Email
               </label>
               <input
-                type="text"
+                type="email"
                 name="identifier"
                 value={formData.identifier}
                 onChange={handleChange}
-                placeholder="Enter your username or email"
+                placeholder="name@company.com"
                 className={inputStyle}
                 required
+                disabled={loading}
               />
             </div>
 
@@ -82,14 +94,22 @@ export default function Login() {
                 Password
               </label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
                 className={inputStyle}
                 required
+                disabled={loading}
               />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-sky-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
             </div>
 
             <div className="flex justify-end">

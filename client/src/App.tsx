@@ -9,7 +9,6 @@ import ContactUs from './pages/Contactus/Contact_us';
 import DashboardPage from './pages/Dashboard/Dashboard';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Verify from './pages/Auth/Otpverify';
-import CreateArticle from './pages/Admin/Create_article';
 import ArticleDetail from './pages/Article/ArticleDetail';
 import ArticlePage from './pages/Article/Articles';
 import MainLayout from './components/Layout/MainLayout';
@@ -24,6 +23,12 @@ import DiseaseDetail from './pages/Admin/DiseaseDetail';
 import DiseaseEdit from './pages/Admin/DiseaseEdit';
 import { DiseaseProvider } from './contexts/DiseaseContext';
 import Settings from './pages/Settingpage/Setting';
+
+//admin 
+import AdminRoute from './components/auth/AdminRoute'; 
+import AdminDashboard from './pages/Admin/AdminDashboard/AdminDashboard';
+import CreateArticle from './pages/Admin/Create_article';
+
 function AppContent() {
   return (
     <Routes>
@@ -59,12 +64,6 @@ function AppContent() {
         </ProtectedRoute>
       } />
 
-      <Route path='/admin/diseases' element={<DiseaseProvider><Outlet /></DiseaseProvider>}>
-        <Route index element={<ManageDiseases />} />
-        <Route path=':id' element={<DiseaseDetail />} />
-        <Route path=':id/edit' element={<DiseaseEdit />} />
-      </Route>
-
       <Route path="/articles" element={
         <ProtectedRoute>
           <ArticlePage />
@@ -95,7 +94,47 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+      
+      {/* admin route */}
+      <Route 
+          path='/admin/dashboard' 
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } 
+      />
+      {/* Admin Dashboard */}
+      <Route 
+        path='/admin/dashboard' 
+        element={<AdminRoute><AdminDashboard /></AdminRoute>} 
+      />
 
+      {/* Disease Management Group */}
+      <Route 
+        path='/admin/diseases' 
+        element={
+          <AdminRoute>
+            <DiseaseProvider>
+              <Outlet />
+            </DiseaseProvider>
+          </AdminRoute>
+        }
+      >
+        <Route index element={<ManageDiseases />} />
+        <Route path=':id' element={<DiseaseDetail />} />
+        <Route path=':id/edit' element={<DiseaseEdit />} />
+      </Route>
+
+      {/* Create Article - Move it HERE */}
+      <Route 
+        path='/admin/createArticle' 
+        element={
+          <AdminRoute>
+            <CreateArticle />
+          </AdminRoute>
+        } 
+      />
     </Routes>
   );
 }
