@@ -7,9 +7,10 @@ const CreateArticle = () => {
   const [date, setDate] = useState("");
 
   type ContentBlock =
-    | { type: "paragraph"; text: string }
-    | { type: "header"; text: string }
-    | { type: "image"; file: File | null; preview: string | null };
+  | { type: "paragraph"; text: string }
+  | { type: "header"; text: string }
+  | { type: "image"; file: File | null; preview: string | null }
+  | { type: "bullet"; items: string[] };
 
   const [content, setContent] = useState<ContentBlock[]>([]);
 
@@ -34,6 +35,9 @@ const CreateArticle = () => {
       ...content,
       { type: "image", file: null, preview: null },
     ]);
+  };
+  const addBulletBlock = () => {
+  setContent([...content, { type: "bullet", items: [""] }]);
   };
 
   const deleteBlock = (index: number) => {
@@ -105,6 +109,12 @@ const CreateArticle = () => {
                 className="bg-[#33A6DC] text-white px-4 py-2 rounded-md hover:bg-blue-600"
             >
                 + Image
+            </button>
+            <button
+                onClick={addBulletBlock}
+                className="bg-[#33A6DC] text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            >
+                + Bullet List
             </button>
          </div>
 
@@ -201,10 +211,85 @@ const CreateArticle = () => {
                 </div>
               );
             }
+            if (block.type === "bullet") {
+  return (
+    <div key={index} className="mb-4">
+      
+      {/* Bullet Container */}
+      <div className="border border-gray-200 p-4 rounded-2xl">
+        {block.items.map((item, itemIndex) => (
+          <div key={itemIndex} className="mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">•</span>
 
-            return null;
-          })}
-        </div>
+              <input
+                className="flex-1 border border-gray-300 p-2 rounded-md"
+                placeholder="Bullet item"
+                value={item}
+                onChange={(e) => {
+                  const newContent = [...content];
+                  const bulletBlock = newContent[index] as {
+                    type: "bullet";
+                    items: string[];
+                  };
+                  bulletBlock.items[itemIndex] = e.target.value;
+                  setContent(newContent);
+                }}
+              />
+            </div>
+
+            <div className="flex justify-between mt-2">
+              {/* Add bullet */}
+              <button
+                onClick={() => {
+                  const newContent = [...content];
+                  const bulletBlock = newContent[index] as {
+                    type: "bullet";
+                    items: string[];
+                  };
+                  bulletBlock.items.push("");
+                  setContent(newContent);
+                }}
+                className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+              >
+                Add
+              </button>
+
+              {/* Remove specific bullet */}
+              <button
+                onClick={() => {
+                  const newContent = [...content];
+                  const bulletBlock = newContent[index] as {
+                    type: "bullet";
+                    items: string[];
+                  };
+                  bulletBlock.items = bulletBlock.items.filter(
+                    (_, i) => i !== itemIndex
+                  );
+                  setContent(newContent);
+                }}
+                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Remove whole bullet list block (OUTSIDE container) */}
+      <button
+        onClick={() => deleteBlock(index)}
+        className="bg-red-500 text-white px-3 py-1 rounded-md mt-2 hover:bg-red-600"
+      >
+        Remove
+      </button>
+    </div>
+  );
+}
+        return null;
+      })}
+    </div>
 
         {/* Buttons */}
         <div className="flex justify-between">
