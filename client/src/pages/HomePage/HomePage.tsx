@@ -6,25 +6,44 @@ import ProcessSection from '../../components/Layout/Sections/ProcessSection';
 import ExistsSection from '../../components/Layout/Exists';
 import ParentSaidSection from '../../components/Layout/Parentsaid';
 import { useNavigate } from 'react-router-dom';
+import { Loader2 } from "lucide-react";
+import { useState } from 'react';
 
 export default function HomePage() {
-  const handleNavigation = () => {
-  // 1. Check if token exists in localStorage
-  const token = localStorage.getItem("token"); 
-
-  if (token) {
-    // User is verified/logged in
-    navigate("/dashboard");
-  } else {
-    // User is not verified
-    navigate("/login"); // or "/verify"
-  }
+  const navigate = useNavigate();
+  const [isNavigating, setIsNavigating] = useState(false);
+  const handleNavigation = async () => {
+    setIsNavigating(true);
+    // 1. Check if token exists in localStorage
+    try {
+      const token = localStorage.getItem("token");
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (token) {
+        // User is verified/logged in
+        navigate("/dashboard");
+      } else {
+        // User is not verified
+        navigate("/login"); // or "/verify"
+      }
+    } catch (error) {
+      console.error("Navigation error:", error);
+    }finally {
+      // If navigation is internal, the component unmounts, 
+      // but it's good practice to set this to false
+      setIsNavigating(false); 
+    }
   };
   
-  const navigate = useNavigate();
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-white to-blue-50/30 flex flex-col">
-      
+      {isNavigating && (
+        <div className='fixed inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center'>
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className='h-12 w-12 animate-spin text-[#3ba8df]' />
+            <p className="font-bold text-slate-700">Loading to dashboard...</p>
+            </div>
+          </div>
+      )}
       <div className="relative flex-grow flex items-center py-12 md:py-0 min-h-[500px]">
         <div 
           className="hidden md:block absolute inset-y-0 right-0 w-1/2 z-0"
