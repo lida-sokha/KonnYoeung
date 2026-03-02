@@ -26,6 +26,7 @@ import CreateArticle from './pages/Admin/Create_article';
 import DiseaseDetail from './pages/Admin/DiseaseDetail';
 import DiseaseEdit from './pages/Admin/DiseaseEdit';
 import ManageDiseases from './pages/Admin/ManageDiseases';
+import ManageUsers from './pages/Admin/ManageUser';
 
 function AppContent() {
   return (
@@ -109,14 +110,14 @@ function AppContent() {
       />
     
 
-      {/* <Route
+      <Route
         path='/admin/all-users'
         element={
           <AdminRoute>
             <ManageUsers />
         </AdminRoute>
       }
-      /> */}
+      />
       
       {/* Disease Management Group */}
       <Route 
