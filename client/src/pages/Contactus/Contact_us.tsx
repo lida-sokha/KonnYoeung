@@ -1,5 +1,5 @@
+import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import React, { useState } from 'react';
-
 interface FormData {
   name: string;
   email: string;
@@ -9,7 +9,7 @@ interface FormData {
 }
 
 interface ContactCardProps {
-  icon: string;
+  icon: React.ReactNode;
   title: string;
   content: string;
   subContent?: string;
@@ -79,12 +79,12 @@ const ContactUsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-white py-16 px-4">
+      <section className="bg-sky-300 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Get in <span className="text-sky-400">Touch</span>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            Get in <span className="text-white">Touch</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-blue-900 max-w-2xl mx-auto">
             Have questions about child health? We're here to help you
             navigate your parenting journey with reliable information
             and support.
@@ -102,28 +102,28 @@ const ContactUsPage: React.FC = () => {
             </h2>
 
             <ContactCard
-              icon="📧"
+              icon={<Mail size={24} />}
               title="Email Us"
               content="contact@konnyoeung.com"
               subContent="support@konnyoeung.com"
             />
 
             <ContactCard
-              icon="📱"
+              icon={<Phone size={24} />}
               title="Call Us"
               content="+855 23 XXX XXX"
               subContent="Monday - Friday: 8:00 AM - 5:00 PM"
             />
 
             <ContactCard
-              icon="📍"
+              icon={<MapPin size={24} />}
               title="Visit Us"
               content="Street XXX, Sangkat XXX"
               subContent="Khan Chamkarmon, Phnom Penh, Kingdom of Cambodia"
             />
 
             <ContactCard
-              icon="⏰"
+              icon={<Clock size={24} />}
               title="Office Hours"
               content="Monday - Friday: 8:00 AM - 5:00 PM"
               subContent="Saturday: 9:00 AM - 1:00 PM | Sunday: Closed"
@@ -214,11 +214,10 @@ const ContactUsPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full bg-gradient-to-r from-sky-400 to-blue-500 text-white font-semibold py-4 rounded-lg transition-all ${
-                  isSubmitting
+                className={`w-full bg-gradient-to-r from-sky-400 to-blue-500 text-white font-semibold py-4 rounded-lg transition-all ${isSubmitting
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:shadow-lg hover:-translate-y-0.5'
-                }`}
+                  }`}
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
@@ -227,7 +226,7 @@ const ContactUsPage: React.FC = () => {
         </div>
       </section>
 
-     
+
     </div>
   );
 };

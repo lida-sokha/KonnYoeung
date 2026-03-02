@@ -1,0 +1,16 @@
+// src/components/Layout/MainLayout.js
+import { Outlet } from 'react-router-dom';
+import Navbar from './Navbar';
+import Footer from './Footer';
+
+const MainLayout = () => (
+    <>
+        <Navbar />
+        <main>
+            <Outlet />
+        </main>
+        <Footer />
+    </>
+);
+
+export default MainLayout;

@@ -16,7 +16,7 @@ const options = {
       },
     ],
   },
-  apis: [path.join(__dirname, "../routes/*.js")], // ✅ FIXED
+  apis: [path.join(__dirname, "../routes/*.js")], 
 };
 
 const swaggerSpec = swaggerJsdoc(options);

@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["parent", "admin"],
       default: "parent"
-    }
+    },
+    savedHospitals: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hospital' }]
   },
   {
     timestamps: true 
