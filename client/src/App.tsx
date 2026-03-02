@@ -108,6 +108,7 @@ function AppContent() {
         path='/admin/dashboard' 
         element={<AdminRoute><AdminDashboard /></AdminRoute>} 
       />
+    
 
       <Route
         path='/admin/all-users'

@@ -24,11 +24,9 @@ const TestimonialCard = ({ name, location, description, rating }: TestimonialCar
 
       <div className="flex gap-1 mb-6">
         {[...Array(5)].map((_, i) => (
-          <FaStar 
-            key={i} 
-            className={i < rating ? "text-yellow-400" : "text-slate-200"} 
-            size={18} 
-          />
+          <span key={i} className="text-lg">
+            {i < rating ? "⭐️" : "☆"}
+          </span>
         ))}
       </div>
 

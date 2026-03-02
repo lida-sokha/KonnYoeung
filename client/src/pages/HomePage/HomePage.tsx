@@ -17,7 +17,7 @@ export default function HomePage() {
     // 1. Check if token exists in localStorage
     try {
       const token = localStorage.getItem("token");
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 80));
       if (token) {
         // User is verified/logged in
         navigate("/dashboard");
@@ -40,7 +40,7 @@ export default function HomePage() {
         <div className='fixed inset-0 z-[100] bg-white/60 backdrop-blur-sm flex items-center justify-center'>
           <div className="flex flex-col items-center gap-4">
             <Loader2 className='h-12 w-12 animate-spin text-[#3ba8df]' />
-            <p className="font-bold text-slate-700">Loading to dashboard...</p>
+            <p className="font-bold text-slate-700">Loading...</p>
             </div>
           </div>
       )}
