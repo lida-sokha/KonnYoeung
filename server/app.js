@@ -7,6 +7,7 @@ const setupSwagger = require("./src/config/swagger.js");
 const userRoutes = require("./src/routes/user.route.js");
 const hospitalRoutes = require("./src/routes/hospital.route.js");
 const articleRoutes = require("./src/routes/article.route.js");
+const adminRoutes = require("./src/routes/admin.route.js");
 
 const app = express();
 app.use(cookieParser());
@@ -28,6 +29,7 @@ mongoose.connect(process.env.MONGODB_URI)
     app.use("/api/users", userRoutes);
     app.use('/api/hospitals', hospitalRoutes);
     app.use("/api/articles", articleRoutes);
+    app.use("/api/admin",adminRoutes);
 
     // Root
     app.get("/", (req, res) => {
