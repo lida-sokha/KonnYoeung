@@ -14,7 +14,7 @@ const ManageUsers = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [newUser, setNewUser] = useState({ userName: "", email: "", password: "", role: "user" });
+    const [newUser, setNewUser] = useState({ fullName: "", email: "", password: "", role: "user" });
     const fetchUser = async () => {
         try {
             setLoading(true);
@@ -33,11 +33,15 @@ const ManageUsers = () => {
     const handleCreateUser = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await API.post("/admin/create-user", newUser); // Ensure you have this route
-            setShowModal(false);
-            fetchUser();
-        } catch (error) {
-            console.error("can't create users", error);
+            const response = await API.post("/admin/create-user", newUser);
+            if (response.data.success || response.status == 201) {
+                setShowModal(false);
+                setNewUser({ fullName: "", email: "", password: "", role: "parent" });
+                await fetchUser();
+            }
+        } catch (error: any) {
+            console.error("Creation failed:", error);
+            alert(error.response?.data?.message || "Failed to create user");
         }
     }
     return (
@@ -110,7 +114,34 @@ const ManageUsers = () => {
                     <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
                         <h2 className="text-2xl font-bold mb-6">Create New User</h2>
                         <form onSubmit={handleCreateUser} className="space-y-4">
-                            {/* not yet finish the create user button */}
+                            <input
+                                type="text" placeholder="fullName" required className="w-full border p-3 rounded-xl"
+                                onChange={(e) => setNewUser({...newUser,fullName:e.target.value})}
+                            />
+                            <input
+                                type="email" placeholder="email" required className="w-full border p-3 rounded-xl"
+                                onChange={(e) => setNewUser({...newUser,email:e.target.value})}
+                            />
+                            <input
+                                type="password" placeholder="password" required className="w-full border p-3 rounded-xl"
+                                onChange={(e) => setNewUser({...newUser,password:e.target.value})}
+                            />
+                            <select className="w-full border p-3 rounded-xl" 
+                                onChange={(e) => setNewUser({ ...newUser, role: e.target.value})}
+                            >
+                                <option value="parent">Parent</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" 
+                                    onClick={() => setShowModal(false)}
+                                    className="flex-1 py-3 text-gray-500 font-semibold">
+                                    Cancel
+                                </button>
+                                <button type="submit" className="flex-1 bg-sky-500 text-white py-3 rounded-xl font-bold" onClick={()=> handleCreateUser}>
+                                    Create
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
