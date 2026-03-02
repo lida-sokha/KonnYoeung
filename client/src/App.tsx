@@ -1,12 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
-import Navbar from '../src/components/Layout/Navbar';
-import Footer from '../src/components/Layout/Footer';
-<<<<<<< HEAD
-import AboutUsPage from './pages/Aboutus/About_us';
-function App() {
-  return (
-    <Router>
-=======
 import HomePage from './pages/HomePage/HomePage';
 import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
@@ -24,9 +16,6 @@ import CheckSymptoms from './pages/Symptoms/CheckSymptoms';
 import SymptomStart from './pages/Symptoms/SymptomStart';
 import SymptomResult from './pages/Symptoms/SymptomResult';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import ManageDiseases from './pages/Admin/ManageDiseases';
-import DiseaseDetail from './pages/Admin/DiseaseDetail';
-import DiseaseEdit from './pages/Admin/DiseaseEdit';
 import { DiseaseProvider } from './contexts/DiseaseContext';
 import Settings from './pages/Settingpage/Setting';
 
@@ -34,29 +23,12 @@ import Settings from './pages/Settingpage/Setting';
 import AdminRoute from './components/auth/AdminRoute'; 
 import AdminDashboard from './pages/Admin/AdminDashboard/AdminDashboard';
 import CreateArticle from './pages/Admin/Create_article';
+import DiseaseDetail from './pages/Admin/DiseaseDetail';
+import DiseaseEdit from './pages/Admin/DiseaseEdit';
+import ManageDiseases from './pages/Admin/ManageDiseases';
 
 function AppContent() {
   return (
-<<<<<<< HEAD
-    <Router>
-      {/* Navbar stays OUTSIDE Routes so it shows on every page */}
-      <Navbar /> 
->>>>>>> 9cd30a9e5551054095ac7dd83702684dd60ac720
-      
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutUsPage />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-      </Routes>
-<<<<<<< HEAD
-
-      
-=======
-      <Footer />
->>>>>>> 9cd30a9e5551054095ac7dd83702684dd60ac720
-=======
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/" element={<HomePage />} />
@@ -135,7 +107,17 @@ function AppContent() {
         path='/admin/dashboard' 
         element={<AdminRoute><AdminDashboard /></AdminRoute>} 
       />
+    
 
+      {/* <Route
+        path='/admin/all-users'
+        element={
+          <AdminRoute>
+            <ManageUsers />
+        </AdminRoute>
+      }
+      /> */}
+      
       {/* Disease Management Group */}
       <Route 
         path='/admin/diseases' 
@@ -171,7 +153,6 @@ function App() {
       <GoogleOAuthProvider clientId="">
         <AppContent />
       </GoogleOAuthProvider>
->>>>>>> 3f32afd5fc9d50e72c45805475ae08402fd674a1
     </Router>
   );
 }
