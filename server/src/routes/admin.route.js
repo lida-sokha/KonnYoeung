@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    getAllUser, createUser
+    getAllUser, createUser , deleteUser
 } = require('../controllers/admin.controller');
 
 /**
@@ -119,4 +119,31 @@ router.get("/all-users", getAllUser);
  *         description: Internal server error
  */
 router.post("/create-user", createUser);
+
+/**
+ * @swagger
+ * /api/admin/delete-user/{id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The MongoDB ID of the user to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/delete-user/:id", deleteUser);
+
 module.exports = router;
