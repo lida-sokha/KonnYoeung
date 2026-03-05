@@ -1,8 +1,14 @@
+const multer = require("multer");
 const express = require('express');
 const router = express.Router();
 
+const storage = multer.memoryStorage();
+const upload = multer({ 
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 } // Optional: Limit files to 5MB
+});
 const {
-    getAllUser, createUser , deleteUser
+    getAllUser, createUser, deleteUser, createArticle
 } = require('../controllers/admin.controller');
 
 /**
@@ -146,4 +152,51 @@ router.post("/create-user", createUser);
  */
 router.delete("/delete-user/:id", deleteUser);
 
+
+/**
+ * @swagger
+ * /api/admin/create-article:
+ *   post:
+ *     summary: Create an article and upload images to Cloudinary
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Article title
+ *               author:
+ *                 type: string
+ *                 description: Name of the author
+ *               content:
+ *                 type: string
+ *                 description: JSON string of article blocks
+ *               articleImages:
+ *                 type: array
+ *                 description: Multiple images for the article
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: Article created successfully
+ *       400:
+ *         description: Invalid request data
+ *       401:
+ *         description: Unauthorized (Token missing or invalid)
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+  "/create-article",
+  upload.array("articleImages"), 
+  createArticle
+);
 module.exports = router;

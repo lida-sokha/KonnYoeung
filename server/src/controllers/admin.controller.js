@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs'); 
 const jwt = require('jsonwebtoken');
 const User = require("../models/User");
+const Article = require("../models/Article");
+const cloudinary = require('cloudinary').v2;
 
 exports.getAllUser = async (req, res) => {
     try {
@@ -70,3 +72,97 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 }
+
+exports.createArticle = async (req, res) => {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_KEY,
+        api_secret: process.env.CLOUDINARY_SECRET
+    });
+
+    try {
+        const { title, author, date, status } = req.body;
+        
+        let blocks;
+        try {
+            blocks = JSON.parse(req.body.content);
+        } catch (e) {
+            return res.status(400).json({ success: false, error: "Invalid JSON format in content field" });
+        }
+
+        const files = req.files || [];
+        const article_ID = Math.floor(Date.now() / 1000);
+
+        let imageCounter = 0;
+        const formattedBlocks = [];
+
+        for (const block of blocks) {
+            const base = { content_order: block.order };
+
+            if (block.type === "paragraph") {
+                formattedBlocks.push({ ...base, content_type: "Parapragh", content: block.text });
+            } 
+            else if (block.type === "header") {
+                formattedBlocks.push({ ...base, content_type: "Header", content: block.text });
+            } 
+            else if (block.type === "bullet") {
+                formattedBlocks.push({ ...base, content_type: "List", content: block.items.join("||") });
+            } 
+            else if (block.type === "image") {
+                const file = files[imageCounter];
+                
+                if (file) {
+                    const uploadResult = await new Promise((resolve, reject) => {
+                        const stream = cloudinary.uploader.upload_stream(
+                            {
+                                folder: "articles",
+                                public_id: `${article_ID}_${imageCounter}`, 
+                                resource_type: "image"
+                            },
+                            (error, result) => {
+                                if (error) reject(error);
+                                else resolve(result);
+                            }
+                        );
+                        stream.end(file.buffer);
+                    });
+
+                    formattedBlocks.push({ 
+                        ...base, 
+                        content_type: "Image", 
+                        image_url: uploadResult.secure_url 
+                    });
+                    imageCounter++;
+                } else {
+                    formattedBlocks.push({ ...base, content_type: "Image", image_url: "" });
+                }
+            }
+        }
+
+        // 4. Save to MongoDB
+        const newArticle = new Article({
+            article_ID: article_ID, 
+            article_title: title,
+            article_author: author,
+            publish_date: date || new Date(),
+            article_status: status || 'Published',
+            content_block: formattedBlocks
+        });
+
+        await newArticle.save();
+        
+        res.status(201).json({ 
+            success: true, 
+            message: "Article created successfully!",
+            article_ID: article_ID 
+        });
+
+    } catch (error) {
+        console.error("Backend Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message,
+            tip: "Check if your CLOUDINARY_KEY is correctly set in the .env file."
+        });
+    }
+};
