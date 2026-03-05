@@ -8,7 +8,7 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // Optional: Limit files to 5MB
 });
 const {
-    getAllUser, createUser, deleteUser, createArticle
+    getAllUser, createUser, deleteUser, createArticle, getallArticle
 } = require('../controllers/admin.controller');
 
 /**
@@ -199,4 +199,36 @@ router.post(
   upload.array("articleImages"), 
   createArticle
 );
+
+/**
+ * @swagger
+ * /api/admin/articles:
+ *   get:
+ *     summary: Retrieve all articles
+ *     tags:
+ *       - Admin
+ *     description: Get a list of all articles from the database, sorted by newest first.
+ *     responses:
+ *       200:
+ *         description: A list of articles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 count:
+ *                   type: integer
+ *                   example: 1
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Article'
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/articles", getallArticle);
+
 module.exports = router;

@@ -166,3 +166,22 @@ exports.createArticle = async (req, res) => {
         });
     }
 };
+
+// Get all articles
+exports.getallArticle = async (req, res) => {
+    try {
+        const articles = await Article.find().sort({ publish_date: -1 });
+
+        res.status(200).json({
+            success: true,
+            count: articles.length,
+            data: articles
+        });
+    } catch (error) {
+        console.error("Error fetching articles:", error);
+        res.status(500).json({
+            success: false,
+            error: "Server Error: Could not fetch articles"
+        });
+    }
+};
