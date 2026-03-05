@@ -20,7 +20,7 @@ const CreateUser = () => {
     try {
       const response = await API.post("/admin/create-user", formData);
       if (response.status === 201 || response.data.success) {
-        navigate("/admin/users");
+        navigate("/admin/all-users");
       }
     } catch (error: any) {
       alert(error.response?.data?.message || "Failed to create user");
@@ -36,7 +36,7 @@ const CreateUser = () => {
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/admin/all-users')}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600"
             >
               <ArrowLeft size={25} />
