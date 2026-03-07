@@ -1,9 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
+import API from '../../services/api';
 import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
-import { Trash2, Plus, Image as ImageIcon, Type, List, Heading } from "lucide-react"; // Using lucide for better icons
-
+import { Trash2, Plus, Image as ImageIcon, Type, List, Heading, Calendar} from "lucide-react"; 
+import { useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 const CreateArticle = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [date, setDate] = useState("");
@@ -17,21 +19,18 @@ const CreateArticle = () => {
 
   const [content, setContent] = useState<ContentBlock[]>([]);
 
-  // --- API CONNECTION LOGIC ---
   const handlePublish = async () => {
     if (!title || !author) return alert("Please fill in Title and Author");
     
     setLoading(true);
+    const loadingToast = toast.loading("Publishing article...");
     const formData = new FormData();
     
-    // 1. Append basic fields
     formData.append("title", title);
     formData.append("author", author);
     formData.append("date", date);
     formData.append("status", "Published");
 
-    // 2. Separate files and text content
-    // We send 'content' as a stringified JSON and 'articleImages' as files
     const contentData = content.map((block, index) => {
       const { ...rest } = block;
       return { ...rest, order: index + 1 };
@@ -39,7 +38,6 @@ const CreateArticle = () => {
 
     formData.append("content", JSON.stringify(contentData));
 
-    // 3. Append all images to the same key 'articleImages' (matches backend upload.array)
     content.forEach((block) => {
       if (block.type === "image" && block.file) {
         formData.append("articleImages", block.file);
@@ -47,23 +45,23 @@ const CreateArticle = () => {
     });
 
     try {
-      const response = await axios.post("http://localhost:5000/api/admin/create-article", formData, {
+      const response = await API.post("/admin/create-article", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response.data.success) {
-        alert("Article published successfully!");
-        // Reset form or redirect
+        toast.success("Article published sucessfully!", { id: loadingToast });
+        setTimeout(() => {
+          navigate("/admin/articles");
+        }, 1500);
       }
     } catch (error: any) {
-      console.error("Upload Error:", error);
-      alert(error.response?.data?.error || "Failed to publish article");
+      toast.error(error.response?.data?.error || "Failed to publish", { id: loadingToast });
     } finally {
       setLoading(false);
     }
   };
 
-  // --- HELPER FUNCTIONS ---
   const addBlock = (type: ContentBlock["type"]) => {
     const order = content.length + 1;
     if (type === "paragraph") setContent([...content, { type: "paragraph", text: "", order }]);
@@ -78,11 +76,11 @@ const CreateArticle = () => {
 
   return (
     <AdminDashboardLayout>
-      <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="max-w-auto mx-auto px-6 py-10">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-800">Create New Article</h1>
           <div className="flex gap-3">
-            <button className="px-5 py-2 text-gray-600 hover:bg-gray-100 rounded-xl transition">Save Draft</button>
+            <button className="px-5 py-2 text-white bg-red-400 hover:bg-gray-100 rounded-xl transition">Save Draft</button>
             <button 
               onClick={handlePublish}
               disabled={loading}
@@ -94,54 +92,109 @@ const CreateArticle = () => {
         </header>
 
         {/* Info Section */}
-        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm mb-8 space-y-4">
+        <section className="bg-white p-6 border-blue-200 border-2 rounded-3xl shadow-sm mb-8 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-500 ml-1">Title</label>
+              <label className="text-m font-medium text-gray-500 ml-1">Title</label>
               <input
                 type="text"
-                className="w-full mt-1 bg-gray-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full mt-1 bg-gray-50 border-blue-200 border-2 p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Enter catchy title..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-500 ml-1">Author Name</label>
+              <label className="text-m font-medium text-gray-500 ml-1">Author Name</label>
               <input
                 type="text"
-                className="w-full mt-1 bg-gray-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full mt-1 bg-gray-50 border-2 border-blue-200 p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
                 placeholder="Who wrote this?"
                 value={author}
                 onChange={(e) => setAuthor(e.target.value)}
               />
             </div>
           </div>
-          <div className="w-1/3">
-             <label className="text-sm font-medium text-gray-500 ml-1">Publish Date</label>
-             <input type="date" className="w-full mt-1 bg-gray-50 border-none p-4 rounded-2xl outline-none" value={date} onChange={(e)=>setDate(e.target.value)} />
+          <div className="w-1/3 group">
+            <label className="text-m font-medium text-gray-500 ml-1">
+              Publish Date
+            </label>
+            
+            <div className={`relative mt-1 rounded-2xl border-2 transition-all duration-200 bg-gray-100/50
+              ${date ? 'border-blue-200' : 'border-gray-100'} 
+              group-focus-within:border-blue-500 group-focus-within:ring-4 group-focus-within:ring-blue-50`}
+            >
+              <input 
+                type="date" 
+                className="w-full p-4 bg-transparent outline-none text-gray-700 font-medium cursor-pointer
+                          [&::-webkit-calendar-picker-indicator]:absolute
+                          [&::-webkit-calendar-picker-indicator]:w-full
+                          [&::-webkit-calendar-picker-indicator]:h-full
+                          [&::-webkit-calendar-picker-indicator]:left-0
+                          [&::-webkit-calendar-picker-indicator]:top-0
+                          [&::-webkit-calendar-picker-indicator]:opacity-0
+                          [&::-webkit-calendar-picker-indicator]:cursor-pointer" 
+                value={date} 
+                onChange={(e) => setDate(e.target.value)} 
+              />
+              
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-focus-within:text-blue-500">
+                <Calendar size={18} />
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Toolbar */}
-        <div className="flex items-center gap-4 mb-6 p-2 bg-gray-100 rounded-2xl w-fit mx-auto">
-          <button onClick={() => addBlock("header")} className="p-3 hover:bg-white rounded-xl transition flex items-center gap-2 text-sm font-medium"><Heading size={18}/> Header</button>
-          <button onClick={() => addBlock("paragraph")} className="p-3 hover:bg-white rounded-xl transition flex items-center gap-2 text-sm font-medium"><Type size={18}/> Paragraph</button>
-          <button onClick={() => addBlock("image")} className="p-3 hover:bg-white rounded-xl transition flex items-center gap-2 text-sm font-medium"><ImageIcon size={18}/> Image</button>
-          <button onClick={() => addBlock("bullet")} className="p-3 hover:bg-white rounded-xl transition flex items-center gap-2 text-sm font-medium"><List size={18}/> List</button>
+        <div className="sticky top-6 z-30 flex item-center gap-1 mb-10 p-1.5 bg-white/80 backdrop-blur-md border border-gray-200 shadow-2xl rounded-2xl w-fit mx-auto transition-all duration-300">
+          <button
+            onClick={() => addBlock("header")} className="px-4 py-3 rounded-xl transition-all flex items-center gap-2 text-sm font-medium">
+            <div className="p-1.5 bg-blue-100/50 rounded-lg group-hover:bg-blue-100 transition-colors flex">
+              <Heading size={18} className="text-blue-600" />
+            </div>
+            Header
+          </button>
+          <button
+            onClick={() => addBlock("paragraph")} className="px-4 py-3 rounded-xl transition-all flex items-center gap-2 text-sm font-medium">
+            <div className="p-1.5 bg-emerald-100/50 rounded-lg group-hover:bg-emerald-100 transition-colors">
+              <Type size={18} className="text-emerald-600" />
+            </div>
+            Paragraph
+          </button>
+          <button onClick={() => addBlock("image")} className="px-4 py-3 rounded-xl transition-all flex items-center gap-2 text-sm font-medium">
+            <div className="p-1.5 bg-purple-100 rounded-lg group-hover:bg-purple-100 transition-colors">
+              <ImageIcon size={18} className="text-purple-600" />
+            </div>
+            Image
+          </button>
+          <button onClick={() => addBlock("bullet")} className="px-4 py-3 rounded-xl transition-all flex items-center gap-2 text-sm font-medium">
+            <div className="p-1.5 bg-orange-100/50 rounded-lg group-hover:bg-orange-100 transition-colors">
+              <List size={18} className="text-orange-600"/>
+            </div>
+            List
+          </button>
         </div>
 
         {/* Content Area */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {content.map((block, index) => (
-            <div key={index} className="group relative bg-white p-2 rounded-2xl hover:shadow-md transition border border-transparent hover:border-gray-200">
-              <button 
-                onClick={() => deleteBlock(index)}
-                className="absolute -right-2 -top-2 p-2 bg-red-100 text-red-600 rounded-full opacity-0 group-hover:opacity-100 transition shadow-sm"
-              >
-                <Trash2 size={16}/>
-              </button>
-
+            // 
+            <div
+              key={index} className="group relative bg-white rounded-xl tansition-all duration-200 border-2 border-blue-300 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50 shadow-sm hover:shadow-md">
+              <div className="flex item-center justify-between px-6 py-2 border-b border-gray-100  rounded-xl">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase tracking-widest font-bold bg-white px-2 py-1 rounded-md border border-gray-100 shadow-sm">
+                    {block.type}
+                  </span>
+                </div>
+                <button 
+                  onClick={() => deleteBlock(index)}
+                  className="p-2 text-gray-400 text-red-500 bg-red-50 rounded-lg transition-colors"
+                  title="Delete Block"
+                >
+                  <Trash2 size={18}/>
+                </button>
+              </div>
               {block.type === "header" && (
                 <input
                   className="w-full text-2xl font-bold p-2 outline-none placeholder:text-gray-300"

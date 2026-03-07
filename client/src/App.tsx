@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage/HomePage';
 import Login from './pages/Auth/Login';
 import SignUp from './pages/Auth/Signup';
@@ -18,6 +19,7 @@ import SymptomResult from './pages/Symptoms/SymptomResult';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { DiseaseProvider } from './contexts/DiseaseContext';
 import Settings from './pages/Settingpage/Setting';
+import toastOptions from './config/toastConfig'
 
 //admin 
 import AdminRoute from './components/auth/AdminRoute'; 
@@ -167,6 +169,11 @@ function AppContent() {
 function App() {
   return (
     <Router>
+      <Toaster position='top-center'
+        reverseOrder={false}
+        gutter={12}
+        toastOptions={toastOptions}
+      />
       <GoogleOAuthProvider clientId="">
         <AppContent />
       </GoogleOAuthProvider>

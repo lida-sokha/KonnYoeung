@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import API from '../../services/api'
 import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
 import { Plus, Eye, Trash2, Edit, Search } from "lucide-react";
+import toast from 'react-hot-toast';
 
 interface Article {
   _id: string;
@@ -22,10 +23,10 @@ const ManageArticle = () => {
   useEffect(() => {
     fetchArticles();
   }, []);
-const fetchArticles = async () => {
+  const fetchArticles = async () => {
   try {
     const response = await API.get("/admin/articles");
-    console.log("Raw Data from Backend:", response.data.data); // Inspect this!
+    console.log("Raw Data from Backend:", response.data.data);
     
     if (response.data.success) {
       setArticles(response.data.data);
@@ -35,22 +36,52 @@ const fetchArticles = async () => {
   } finally {
     setLoading(false);
   }
-    };
+};
+
+const executeDelete = async (id: string) => {
+  const loadingToast = toast.loading("Deleting article...");
+  try {
+    const response = await API.delete(`admin/article/${id}`);
     
-const deleteArticle = async (id: string) => {
-  if (window.confirm("Are you sure you want to delete this article?")) {
-    try {
-      const response = await API.delete(`admin/article/${id}`);
-      
-      if (response.data.success) {
-        setArticles(articles.filter((art) => art._id !== id));
-      }
-    } catch (error) {
-      console.error("Delete Error:", error);
-      alert("Failed to delete article");
+    if (response.data.success) {
+      setArticles(articles.filter((art) => art._id !== id));
+      toast.success("Article deleted successfully!", { id: loadingToast });
     }
+  } catch (error: any) {
+    toast.error(error.response?.data?.error || "Failed to delete the article", { id: loadingToast });
   }
 };
+
+  const confirmDelete = (id: string) => {
+    toast((t) => (
+      <div className="flex flex-col gap-3 p-1">
+        <span className="text-sm font-medium text-gray-800">
+          Delete this article? This cannot be undone.
+        </span>
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              executeDelete(id);
+            }}
+            className="px-3 py-1.5 text-xs font-semibold bg-red-500 text-white hover:bg-red-600 rounded-lg shadow-sm transition"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ), {
+      duration: 6000,
+      position: 'top-center',
+      style: { minWidth: '300px', border: '1px solid #fee2e2' }
+    });
+  };
 
   const filteredArticles = articles.filter((art) =>
     art.article_title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -63,7 +94,7 @@ const deleteArticle = async (id: string) => {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Manage Articles</h1>
-            <p className="text-gray-500 text-sm">Create, edit, and manage your content</p>
+            <p className="text-gray-500 text-m">Create, edit, and manage your content</p>
           </div>
           <button
             onClick={() => navigate("/admin/createArticle")}
@@ -133,7 +164,7 @@ const deleteArticle = async (id: string) => {
                         <Edit size={18} />
                       </button>
                       <button 
-                        onClick={() => deleteArticle(article._id)}
+                        onClick={() => confirmDelete(article._id)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                       >
                         <Trash2 size={18} />
