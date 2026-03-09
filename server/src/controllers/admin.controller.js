@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require("../models/User");
 const Article = require("../models/Article");
+const Counter = require('../models/Counter');  
 const cloudinary = require('cloudinary').v2;
 
 exports.getAllUser = async (req, res) => {
@@ -89,11 +90,20 @@ exports.createArticle = async (req, res) => {
         } catch (e) {
             return res.status(400).json({ success: false, error: "Invalid JSON format in content field" });
         }
+        const topArticle = await Article.findOne().sort("-article_ID");
+        const highestId = topArticle ? topArticle.article_ID : 0;
+
+        const counter = await Counter.findOneAndUpdate(
+            { id: 'article_id_sequence' },
+            { $set: { seq: highestId + 1 } },
+            { new: true, upsert: true }
+        );
+
+        const continuous_ID = counter.seq;
 
         const files = req.files || [];
-        const article_ID = Math.floor(Date.now() / 1000);
 
-        let imageCounter = 0;
+        let imageCounter = 1;
         const formattedBlocks = [];
 
         for (const block of blocks) {
@@ -109,14 +119,14 @@ exports.createArticle = async (req, res) => {
                 formattedBlocks.push({ ...base, content_type: "List", content: block.items.join("||") });
             } 
             else if (block.type === "image") {
-                const file = files[imageCounter];
+                const file = files[imageCounter-1 ];
                 
                 if (file) {
                     const uploadResult = await new Promise((resolve, reject) => {
                         const stream = cloudinary.uploader.upload_stream(
                             {
                                 folder: "articles",
-                                public_id: `${article_ID}_${imageCounter}`, 
+                                public_id: `article${continuous_ID}_image${imageCounter}`, 
                                 resource_type: "image"
                             },
                             (error, result) => {
@@ -139,13 +149,22 @@ exports.createArticle = async (req, res) => {
             }
         }
 
+        let categoriesArray = [];
+        if (req.body.categories) {
+            try {
+                categoriesArray = JSON.parse(req.body.categories);
+            } catch (e) {
+                categoriesArray = [req.body.categories];
+            }
+        }
         // 4. Save to MongoDB
         const newArticle = new Article({
-            article_ID: article_ID, 
+            article_ID: continuous_ID, 
             article_title: title,
             article_author: author,
             publish_date: date || new Date(),
             article_status: status || 'Published',
+            categories: categoriesArray,
             content_block: formattedBlocks
         });
 
@@ -154,7 +173,7 @@ exports.createArticle = async (req, res) => {
         res.status(201).json({ 
             success: true, 
             message: "Article created successfully!",
-            article_ID: article_ID 
+            article_ID: continuous_ID
         });
 
     } catch (error) {

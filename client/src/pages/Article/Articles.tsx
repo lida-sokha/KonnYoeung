@@ -149,14 +149,29 @@ const handleSaveToggle = async (articleId: string) => {
                       className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all cursor-pointer group flex flex-col h-full border border-gray-100 overflow-hidden"
                     >
                       <div className="relative h-48 bg-gray-100">
-                        <img
-                          src={getImageUrl(art._id)}
-                          alt={art.article_title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            e.currentTarget.src = "https://placehold.co/400x300?text=Image+Not+Found";
-                          }}
-                        />
+                       <img
+                        src={(() => {
+                          const imgBlock = art.content_blocks?.find((b) => b.content_type === "Image");
+                          const url = imgBlock?.image_url;
+
+                          if (!url) return "https://placehold.co/400x300?text=No+Cover+Image";
+
+                          // 1. If it's already a full URL (Starts with http), use it exactly as is
+                          if (url.startsWith("http")) return url;
+
+                          // 2. Build URL for old articles or partial paths
+                          const cloudName = "dprsygcvh";
+                          
+                          // Check if the partial path already contains the 'articles/' folder
+                          // If it doesn't, we assume it's an old direct-root image
+                          return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${url}`;
+                        })()}
+                        alt={art.article_title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/400x300?text=Image+Not+Found";
+                        }}
+                      />
                         <div className="absolute top-2 left-2">
                            <span className="bg-white/90 px-2 py-0.5 rounded text-[10px] font-bold uppercase text-blue-600 shadow-sm">
                              {art.categories[0]}

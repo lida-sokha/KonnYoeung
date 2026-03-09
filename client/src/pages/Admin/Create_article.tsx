@@ -1,7 +1,7 @@
 import { useState } from "react";
 import API from '../../services/api';
 import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
-import { Trash2, Plus, Image as ImageIcon, Type, List, Heading, Calendar} from "lucide-react"; 
+import { Trash2, Plus, Image as ImageIcon, Type, List, Heading, Calendar,X} from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 const CreateArticle = () => {
@@ -10,6 +10,15 @@ const CreateArticle = () => {
   const [author, setAuthor] = useState("");
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [cateInput, setCateInput] = useState("");
+  const categoryOptions = [
+      "Symtoms",
+      "illness",
+      "Emergency",
+      "First-Aids",
+      "Prevention & Care"
+    ];
 
   type ContentBlock =
     | { type: "paragraph"; text: string; order: number }
@@ -19,6 +28,15 @@ const CreateArticle = () => {
 
   const [content, setContent] = useState<ContentBlock[]>([]);
 
+const handleCategorySelect = (value: string) => {
+  if (value !== "") {
+    if (!categories.includes(value)) {
+      setCategories([...categories, value]);
+    }
+    setCateInput(""); 
+  }
+};
+  
   const handlePublish = async () => {
     if (!title || !author) return alert("Please fill in Title and Author");
     
@@ -29,6 +47,7 @@ const CreateArticle = () => {
     formData.append("title", title);
     formData.append("author", author);
     formData.append("date", date);
+    formData.append("categories", JSON.stringify(categories));
     formData.append("status", "Published");
 
     const contentData = content.map((block, index) => {
@@ -115,7 +134,8 @@ const CreateArticle = () => {
               />
             </div>
           </div>
-          <div className="w-1/3 group">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="w-auto group">
             <label className="text-m font-medium text-gray-500 ml-1">
               Publish Date
             </label>
@@ -142,7 +162,41 @@ const CreateArticle = () => {
                 <Calendar size={18} />
               </div>
             </div>
-          </div>
+            </div>
+            <div className="w-auto group">
+                <label className="text-m font-medium text-gray-500 ml-1">Categories</label>
+                
+                <select
+                  className="w-full mt-1 bg-gray-50 border-2 border-blue-200 p-4 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={cateInput}
+                  onChange={(e) => handleCategorySelect(e.target.value)}
+                >
+                  <option value="">Select a Category</option>
+                  {categoryOptions.map(opt => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+
+                {/* THIS PART SHOWS THE SELECTED CATEGORIES */}
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {categories.map((cat, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-sm"
+                    >
+                      {cat}
+                      <button 
+                        type="button" 
+                        onClick={() => setCategories(categories.filter((_, i) => i !== index))}
+                        className="hover:text-red-200 border-l border-blue-400 pl-2 ml-1"
+                      >
+                        <X size={20}></X>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+      </div>
         </section>
 
         {/* Toolbar */}
