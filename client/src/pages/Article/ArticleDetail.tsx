@@ -115,11 +115,20 @@ useEffect(() => {
 }, [article]); 
 
   // Cloudinary Helper (matches your ArticlePage logic)
-  const getImageUrl = (imgName: string) => {
+  const getImageUrl = (path: string | undefined, articleId?: any) => {
     const cloudName = "dprsygcvh";
-    // If the DB provides the full name like "article1_image1.jpg"
-    const publicId = imgName.split(".")[0];
-    return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${publicId}.jpg`;
+    if (path && typeof path === 'string' && path.startsWith("http")) {
+      return path;
+    }
+    
+    if (path && typeof path === 'string') {
+      return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${path}`;
+    }
+    if (articleId) {
+      const idString = articleId.toString();
+    return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${idString}.jpg`;
+    }
+    return "https://placehold.co/400x300?text=No+Image";
   };
 
   if (loading) return <DashboardLayout><div className="p-10 text-center">Loading article...</div></DashboardLayout>;
@@ -141,7 +150,6 @@ useEffect(() => {
             <div className="flex items-center bg-gray-200 rounded-full px-3 py-2 flex-1 md:w-72">
         <Search size={16} className="text-gray-500" />
         <input placeholder="Search" className="bg-transparent outline-none flex-1 mx-2 text-sm" />
-        <Mic size={16} className="text-gray-500 cursor-pointer" />
       </div>
           </div>
           <div className="flex items-center gap-4 self-end md:self-auto">
@@ -151,7 +159,7 @@ useEffect(() => {
             <img 
                 src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
                 alt="Profile" 
-                onClick={() => navigate("/profile")}
+                onClick={() => navigate("/settings")}
                 className="w-10 h-10 rounded-full cursor-pointer border hover:opacity-80 ml-6" 
             />
           </div>
@@ -191,100 +199,116 @@ useEffect(() => {
           </div>
 
           <div className="space-y-6 mt-8">
-            {article.content_blocks
-              .sort((a, b) => a.content_order - b.content_order)
-              .map((block, i) => {
-                switch (block.content_type) {
-                  case "Parapragh":
-                    return <p key={i} className="text-gray-700 leading-relaxed text-lg">{block.content}</p>;
-                  
-                  case "Header":
-                    return <h2 key={i} className="text-2xl font-bold text-gray-800 pt-4">{block.content}</h2>;
-                  
-                  case "Image":
-                    return (
-                      <div key={i} className="py-4">
-                        <img 
-                          src={getImageUrl(block.image_url || "")} 
-                          alt="Article visual" 
-                          className="rounded-2xl w-full object-cover shadow-sm"
-                        />
-                      </div>
-                    );
+              {(article.content_blocks || (article as any).content_block || [])
+                .sort((a: any, b: any) => a.content_order - b.content_order)
+                .map((block: any, i: number) => {
+                  switch (block.content_type?.toLowerCase()) {
+                    
+                    case "parapragh":
+                      return <p key={i} className="text-gray-700 leading-relaxed text-lg">{block.content}</p>;
+                    
+                    case "header":
+                      return <h2 key={i} className="text-2xl font-bold text-gray-800 pt-4">{block.content}</h2>;
+                    
+                    case "image":
+                      return (
+                        <div key={i} className="py-4">
+                          <img 
+                            src={getImageUrl(block.image_url)} 
+                            alt="Article visual" 
+                            className="rounded-2xl w-full object-cover shadow-sm"
+                            onError={(e) => {
+                              e.currentTarget.src = "https://placehold.co/400x300?text=Image+Not+Found";
+                            }}
+                          />
+                        </div>
+                      );
 
-                  case "List":
-                    // Splitting the semicolon-separated string from your DB
-                    const listItems = block.content?.split(';') || [];
-                    return (
-                      <ul key={i} className="list-disc pl-6 space-y-2 text-gray-700 text-lg">
-                        {listItems.map((item, j) => (
-                          <li key={j} className="pl-2">{item.trim()}</li>
-                        ))}
-                      </ul>
-                    );
-                  
-                  default:
-                    return null;
-                }
-            })}
-          </div>
+                    case "list":
+                      const listItems = block.content?.split(';') || [];
+                      return (
+                        <ul key={i} className="list-disc pl-6 space-y-2 text-gray-700 text-lg">
+                          {listItems.map((item: any, j: number) => (
+                            <li key={j} className="pl-2">{item.trim()}</li>
+                          ))}
+                        </ul>
+                      );
+                    
+                    default:
+                      return null;
+                  }
+              })}
+            </div>
         </div>
 
         {/* Sidebar (Kept identical to your design) */}
         <div className="space-y-6">
           {/* Advertisement Section */}
-<div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group">
-  {/* The "AD" Badge */}
-  <div className="absolute top-2 right-2 z-10">
-    <span className="bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm tracking-widest">
-      AD
-    </span>
-  </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative group">
+            {/* The "AD" Badge */}
+            <div className="absolute top-2 right-2 z-10">
+              <span className="bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm tracking-widest">
+                AD
+              </span>
+            </div>
 
-  <a href="https://cadt.edu.kh/" target="_blank" rel="noreferrer" className="block">
-    <div className="relative">
-      <img 
-        src="https://cambodiainvestmentreview.com/wp-content/uploads/2022/03/CADT-0-scaled.jpg" 
-        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" 
-        alt="Advertisement"
-      />
-      {/* Bottom accent line to match your article's tab style */}
-      <span className="absolute bottom-0 left-0 w-full h-[3px] bg-blue-600" />
-    </div>
-    
-    {/* Optional: Add a small text area below the image to make it feel like a "Card" */}
-    <div className="p-3 bg-white">
-      <p className="text-xs text-gray-500 font-medium">CADT - Cambodia Academy of Digital Technology</p>
-    </div>
-  </a>
-</div>
+            <a href="https://cadt.edu.kh/" target="_blank" rel="noreferrer" className="block">
+              <div className="relative">
+                <img 
+                  src="https://cambodiainvestmentreview.com/wp-content/uploads/2022/03/CADT-0-scaled.jpg" 
+                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" 
+                  alt="Advertisement"
+                />
+                {/* Bottom accent line to match your article's tab style */}
+                <span className="absolute bottom-0 left-0 w-full h-[3px] bg-blue-600" />
+              </div>
+              
+              {/* Optional: Add a small text area below the image to make it feel like a "Card" */}
+              <div className="p-3 bg-white">
+                <p className="text-xs text-gray-500 font-medium">CADT - Cambodia Academy of Digital Technology</p>
+              </div>
+            </a>
+          </div>
 
           <div>
             <h3 className="font-semibold border-y my-3 pb-2 text-xl text-center">Latest post</h3>
             <div className="space-y-1">
-            {latestArticles.length > 0 && latestArticles.map((latest) => (
-              <div 
-                key={latest._id} 
-                onClick={() => navigate(`/articles/${latest.article_ID}`)}
-                className="flex gap-3 hover:bg-gray-50 p-2 rounded cursor-pointer border-b border-gray-100 transition-colors group"
-              >
-                <img 
-                  src={getImageUrl(latest._id)} 
-                  className="w-24 h-20 object-cover rounded shadow-sm group-hover:opacity-90" 
-                  alt="Thumbnail"
-                />
-                <div>
-                  <p className="text-sm font-medium line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
-                    {latest.article_title}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-2">
-                    {new Date(latest.publish_date).toLocaleDateString('en-GB', {
-                      day: 'numeric', month: 'short', year: 'numeric'
-                    })}
-                  </p>
-                </div>
-              </div>
-            ))}
+              {latestArticles.length > 0 && latestArticles.map((latest) => {
+                const blocks = (latest as any).content_block || latest.content_blocks;
+                const imageBlock = blocks?.find((b: any) => b.content_type?.toLowerCase() === "image");
+                
+                const thumbnailPath = imageBlock?.image_url;
+
+                return (
+                  <div 
+                    key={latest._id} 
+                    onClick={() => {
+                      navigate(`/articles/${latest.article_ID}`);
+                      window.scrollTo(0, 0); 
+                    }}
+                    className="flex gap-3 hover:bg-gray-50 p-2 rounded cursor-pointer border-b border-gray-100 transition-colors group"
+                  >
+                    <img 
+                      src={getImageUrl(thumbnailPath, latest._id)}
+                      className="w-24 h-20 object-cover rounded shadow-sm group-hover:opacity-90" 
+                      alt="Thumbnail"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://placehold.co/400x300?text=No+Image";
+                      }}
+                    />
+                    <div>
+                      <p className="text-sm font-medium line-clamp-2 leading-snug group-hover:text-blue-600 transition-colors">
+                        {latest.article_title}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {new Date(latest.publish_date).toLocaleDateString('en-GB', {
+                          day: 'numeric', month: 'short', year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
 
             {sidebarLoading && (
               <div className="text-center py-4 text-xs text-gray-400 animate-pulse">

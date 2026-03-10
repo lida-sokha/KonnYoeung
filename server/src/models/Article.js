@@ -23,7 +23,7 @@ const ArticleSchema = new mongoose.Schema({
         content_type: {
             type: String,
             required: true,
-            enum: ['Parapragh', 'Image', 'Header', 'List']
+            enum: ['parapragh', 'Image', 'Header', 'List']
         },
         // For text content (Paragraphs, Headers, Lists)
         content: { type: String },
@@ -31,6 +31,5 @@ const ArticleSchema = new mongoose.Schema({
         image_url: { type: String } 
     }]
 }, { timestamps: true });
-
 
 module.exports = mongoose.model('Article', ArticleSchema, 'Article');
