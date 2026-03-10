@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
 import API from "../../services/api"; 
-import { Search, Mic, ThumbsUp, ThumbsDown, ArrowRight } from "lucide-react";
+import { Search, ThumbsUp, ThumbsDown, ArrowRight } from "lucide-react";
+import Fuse from "fuse.js";
 
 interface ContentBlock {
   content_order: number;
@@ -18,18 +19,22 @@ interface Article {
   article_author: string;
   publish_date: string;
   categories: string[];
-  content_blocks: ContentBlock[]; 
+  content_blocks: ContentBlock[];
+  content_block: ContentBlock[];
   isSaved?: boolean;
   onSaveToggle?: (id: String) => void;
 }
 
 const ArticlePage = () => {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [suggestions, setSuggestions] = useState<Article[]>([]);
+const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const articlesPerPage = 6;
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const tabs = ["All", "Symptoms", "Illness", "Emergency", "First-Aids", "Prevention & Care"];
 
@@ -60,10 +65,6 @@ const ArticlePage = () => {
     fetchArticles();
   }, []);
 
-  const getImageUrl = (articleId: string) => {
-    const cloudName = "dprsygcvh";
-    return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${articleId}.jpg`;
-  };
 
 const filteredArticles = activeTab === "All" 
   ? articles 
@@ -101,19 +102,76 @@ const handleSaveToggle = async (articleId: string) => {
   } catch (error) {
     console.error("Toggle error:", error);
   }
-};
+  };
+  
+  const fuse = useMemo(() => {
+    return new Fuse(articles, {
+      keys: ["article_title", "categories"],
+      threshold: 0.4,
+    });
+  }, [articles]);
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+
+    if (value.length > 1) {
+      const results = fuse.search(value).map(r => r.item).slice(0, 5); // Top 5 results
+      setSuggestions(results);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const query = searchQuery.trim();
+      setShowSuggestions(false);
+      if (query) {
+        navigate(`/articles?search=${encodeURIComponent(query)}`);
+      } else {
+        navigate('/articles');
+      }
+      (e.target as HTMLInputElement).blur();
+    }
+  };
   return (
     <DashboardLayout>
       <div className="px-6 lg:px-10 py-6 max-w-7xl mx-auto">
-        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div className="flex items-center bg-gray-200 rounded-full px-4 py-2 w-full md:w-80">
-            <Search size={18} className="text-gray-500" />
-            <input placeholder="Search articles..." className="bg-transparent outline-none flex-1 mx-2 text-sm" />
-            <Mic size={18} className="text-gray-500 cursor-pointer" />
+          <div className="relative w-full md:w-80">
+            <div className="flex items-center bg-gray-200 rounded-full px-4 py-2 w-full md:w-80">
+              <Search size={18} className="text-gray-500" />
+              <input
+                placeholder="Search articles..."
+                className="bg-transparent outline-none flex-1 mx-2 text-sm"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearch}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)} // Delay so click works
+                onFocus={() => searchQuery.length > 1 && setShowSuggestions(true)}
+              />
+            </div>
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                {suggestions.map((s) => (
+                  <div
+                    key={s._id}
+                    onClick={() => navigate(`/articles/${s.article_ID}`)}
+                    className="px-4 py-3 hover:bg-blue-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-none group"
+                  >
+                    <Search size={14} className="text-gray-400 group-hover:text-blue-500" />
+                    <div>
+                    <p className="text-sm font-medium text-gray-800 line-clamp-1">{s.article_title}</p>
+                    <p className="text-[10px] text-gray-400 uppercase">{s.categories[0]}</p>
+                  </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Health Articles</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Health Articles</h1>
         </div>
 
         <div className="flex gap-8 overflow-x-auto border-b border-gray-200 mb-8">
@@ -151,19 +209,20 @@ const handleSaveToggle = async (articleId: string) => {
                       <div className="relative h-48 bg-gray-100">
                        <img
                         src={(() => {
-                          const imgBlock = art.content_blocks?.find((b) => b.content_type === "Image");
+                          const blocks = art.content_blocks || art.content_block;
+                          
+                          const imgBlock = blocks?.find(
+                            (b) => b.content_type?.toLowerCase() === "image"
+                          );
+                          
                           const url = imgBlock?.image_url;
 
                           if (!url) return "https://placehold.co/400x300?text=No+Cover+Image";
 
-                          // 1. If it's already a full URL (Starts with http), use it exactly as is
                           if (url.startsWith("http")) return url;
 
-                          // 2. Build URL for old articles or partial paths
                           const cloudName = "dprsygcvh";
-                          
-                          // Check if the partial path already contains the 'articles/' folder
-                          // If it doesn't, we assume it's an old direct-root image
+
                           return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${url}`;
                         })()}
                         alt={art.article_title}
