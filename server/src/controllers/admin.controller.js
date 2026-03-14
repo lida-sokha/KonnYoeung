@@ -157,7 +157,6 @@ exports.createArticle = async (req, res) => {
                 categoriesArray = [req.body.categories];
             }
         }
-        // 4. Save to MongoDB
         const newArticle = new Article({
             article_ID: continuous_ID, 
             article_title: title,
@@ -186,7 +185,6 @@ exports.createArticle = async (req, res) => {
     }
 };
 
-// Get all articles
 exports.getallArticle = async (req, res) => {
     try {
         const articles = await Article.find().sort({ publish_date: -1 });
@@ -202,5 +200,118 @@ exports.getallArticle = async (req, res) => {
             success: false,
             error: "Server Error: Could not fetch articles"
         });
+    }
+};
+
+exports.getArticleById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const numericId = parseInt(id);
+
+        if (isNaN(numericId)) {
+            return res.status(400).json({
+                success: false,
+                error: "Article ID must be a number"
+            });
+        }
+
+        const article = await Article.findOne({ article_ID: numericId });
+
+        if (!article) {
+            return res.status(404).json({
+                success: false,
+                error: `Article with ID ${id} not found`
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: article
+        });
+
+    } catch (error) {
+        console.error("Error fetching single article:", error);
+        res.status(500).json({
+            success: false,
+            error: "Server Error: Could not fetch article"
+        });
+    }
+};
+
+exports.deleteArticle = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const article = await Article.findOne({
+            $or: [
+                { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+                { article_ID: !isNaN(id) ? parseInt(id) : null }
+            ].filter(c => Object.values(c)[0] !== null)
+        });
+
+        if (!article) {
+            return res.status(404).json({ success: false, message: "Article not found" });
+        }
+
+        await Article.findByIdAndDelete(article._id);
+
+        res.status(200).json({ 
+            success: true, 
+            message: `Article "${article.article_title}" deleted successfully` 
+        });
+
+    } catch (error) {
+        console.error("Delete Article Error:", error.message);
+        res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    }
+};
+
+exports.updateArticle = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        let updateData = { ...req.body };
+
+        if (req.body.content_block) {
+            try {
+                updateData.content_block = typeof req.body.content_block === 'string' 
+                    ? JSON.parse(req.body.content_block) 
+                    : req.body.content_block;
+            } catch (e) {
+                console.error("JSON Parse Error on content_block:", e);
+            }
+        }
+
+        if (req.body.categories) {
+            try {
+                updateData.categories = typeof req.body.categories === 'string' 
+                    ? JSON.parse(req.body.categories) 
+                    : req.body.categories;
+            } catch (e) {
+                console.error("JSON Parse Error on categories:", e);
+            }
+        }
+
+        const isObjectId = id.match(/^[0-9a-fA-F]{24}$/);
+        const query = isObjectId 
+            ? { _id: id } 
+            : { article_ID: !isNaN(id) ? parseInt(id) : -1 };
+
+        const updatedArticle = await Article.findOneAndUpdate(
+            query, 
+            { $set: updateData }, 
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedArticle) {
+            return res.status(404).json({ success: false, message: "Article not found" });
+        }
+
+        res.status(200).json({ success: true, data: updatedArticle });
+
+    } catch (error) {
+        console.error("SERVER ERROR DURING UPDATE:", error);
+        res.status(500).json({ success: false, error: error.message });
     }
 };

@@ -8,7 +8,7 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // Optional: Limit files to 5MB
 });
 const {
-    getAllUser, createUser, deleteUser, createArticle, getallArticle
+    getAllUser, createUser, deleteUser, createArticle, getallArticle, getArticleById, deleteArticle, updateArticle
 } = require('../controllers/admin.controller');
 
 /**
@@ -231,4 +231,130 @@ router.post(
  */
 router.get("/articles", getallArticle);
 
+/**
+ * @swagger
+ * /api/admin/article/{id}:
+ *   get:
+ *     summary: Get article by ID
+ *     description: Retrieve a single article by its ID
+ *     tags:
+ *       - Admin
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Article retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Article'
+ *       404:
+ *         description: Article not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/article/:id", getArticleById);
+
+
+/**
+ * @swagger
+ * /api/admin/article/{id}:
+ *   delete:
+ *     summary: Delete an article by ID
+ *     description: Deletes an article using either its MongoDB _id (24-character string) or its numerical article_ID.
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The MongoDB _id OR the numerical article_ID
+ *         schema:
+ *           type: string
+ *           example: "64f1234567890abcdef12345"
+ *     responses:
+ *       200:
+ *         description: Article deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized - Token missing or invalid
+ *       404:
+ *         description: Article not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete("/article/:id", deleteArticle);
+
+/**
+ * @swagger
+ * /api/admin/article/{id}:
+ *   put:
+ *     summary: Update an article by ID (Full Edit with Images)
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The MongoDB _id or numerical article_ID
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               article_title:
+ *                 type: string
+ *               article_author:
+ *                 type: string
+ *               article_status:
+ *                 type: string
+ *                 enum:
+ *                   - Draft
+ *                   - Published
+ *               publish_date:
+ *                 type: string
+ *                 format: date
+ *               categories:
+ *                 type: string
+ *                 description: JSON stringified array of categories
+ *               content_blocks:
+ *                 type: string
+ *                 description: JSON stringified array of content blocks
+ *               articleImages:
+ *                 type: array
+ *                 description: New images to upload
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Updated successfully
+ *       400:
+ *         description: Invalid input or file format
+ *       404:
+ *         description: Article not found
+ *       500:
+ *         description: Server error (Check console for Mongoose validation errors)
+ */
+router.put("/article/:id", upload.array('articleImages'), updateArticle);
 module.exports = router;
