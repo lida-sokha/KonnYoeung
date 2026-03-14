@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import API from '../../services/api'
-import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
+import API from '../../../services/api'
+import AdminDashboardLayout from "../../../components/Layout/Sections/AdminDashboardLayout";
 import { Plus, Eye, Trash2, Edit, Search } from "lucide-react";
 import toast from 'react-hot-toast';
 
@@ -12,6 +12,15 @@ interface Article {
   article_author: string;
   publish_date: string;
   article_status: string;
+  content_block?: ContentBlock[]; 
+  content_blocks?: ContentBlock[];
+}
+
+interface ContentBlock {
+  content_order: number;
+  content_type: 'Paragraph' | 'Image' | 'Header' | 'List' | 'Parapragh'; // Including the typo 'Parapragh' just in case
+  content?: string;
+  image_url?: string;
 }
 
 const ManageArticle = () => {
@@ -36,8 +45,17 @@ const ManageArticle = () => {
   } finally {
     setLoading(false);
   }
-};
-
+  };
+  
+const openPreview = async (article: Article) => {
+  navigate(`/admin/preview/${article.article_ID}`);
+  };
+  
+  const openEdite = async (article: Article) => {
+    navigate(`/admin/editArticle/${article.article_ID}`);
+}
+  
+  
 const executeDelete = async (id: string) => {
   const loadingToast = toast.loading("Deleting article...");
   try {
@@ -98,7 +116,7 @@ const executeDelete = async (id: string) => {
           </div>
           <button
             onClick={() => navigate("/admin/createArticle")}
-            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition shadow-md"
+            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-green-700 transition shadow-md"
           >
             <Plus size={20} />
             Create Article
@@ -157,10 +175,13 @@ const executeDelete = async (id: string) => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                      <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                      onClick={() => openPreview(article)}>
                         <Eye size={18} />
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition">
+                      <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition"
+                        onClick={() => openEdite(article)}
+                      >
                         <Edit size={18} />
                       </button>
                       <button 

@@ -30,7 +30,9 @@ import DiseaseEdit from './pages/Admin/DiseaseEdit';
 import ManageDiseases from './pages/Admin/ManageDiseases';
 import ManageUsers from './pages/Admin/ManageUser';
 import CreateUser from './pages/Admin/Create_user';
-import ManageArticle from './pages/Admin/ManageArticle';
+import ManageArticle from './pages/Admin/Article/ManageArticle';
+import AdminPreview from './pages/Admin/Article/AdminPreview';
+import ArticleEditor from './pages/Admin/Article/ArticleEditor';
 
 function AppContent() {
   return (
@@ -161,6 +163,22 @@ function AppContent() {
             <CreateArticle />
           </AdminRoute>
         } 
+      />
+      <Route 
+        path='/admin/preview/:id'
+        element={
+          <AdminRoute>
+            <AdminPreview />
+        </AdminRoute>
+      }
+      />
+      <Route 
+        path='/admin/editArticle/:id'
+        element={
+          <AdminRoute>
+            <ArticleEditor/>
+        </AdminRoute>
+      }
       />
     </Routes>
   );
