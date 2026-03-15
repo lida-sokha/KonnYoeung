@@ -56,9 +56,17 @@ const ManageHospital = () => {
     } catch (error: any) {
       console.error("Delete Error:", error);
       toast.error(error.response?.data?.message || "Failed to delete hospital");
-    }
+        }
   };
 
+    const handleEdite = async (hospitalId: string) => {
+        try {
+            const response = await API.get(`/admin/hospitals/${hospitalId}`);
+    }catch (error: any) {
+      console.error("Can't got the the edit page:", error);
+      toast.error(error.response?.data?.message || "Failed to go to the edit page");
+        }
+}
     return (
         <AdminDashboardLayout>
             <div className="p-6">
@@ -126,7 +134,12 @@ const ManageHospital = () => {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2">
-                                            <button className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"><Edit size={18}/></button>
+                                            <button 
+                                            className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition"
+                                            onClick={() => navigate(`/admin/EditHospital/${h._id}`)}
+                                            >
+                                            <Edit size={18} />
+                                            </button>
                                             <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                                                 onClick={() => handleDelete(h._id!)}
                                             ><Trash2 size={18} /></button>
