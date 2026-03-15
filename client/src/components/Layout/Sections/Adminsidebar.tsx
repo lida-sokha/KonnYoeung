@@ -9,7 +9,7 @@ const Adminsidebar = () => {
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
         { name: 'Manage Diseases', icon: <Stethoscope size={20} />, path: '/admin/diseases' },
         { name: 'Manage Articles', icon: <BookOpen size={20} />, path: '/admin/articles' },
-        { name: 'Manage Hospitals', icon: <MapPin size={20} />, path: '/' },
+        { name: 'Manage Hospitals', icon: <MapPin size={20} />, path: '/admin/hospitals' },
         { name: 'Manage Users', icon: <Settings size={20} />, path: '/admin/all-users' },
     ];
     return (
