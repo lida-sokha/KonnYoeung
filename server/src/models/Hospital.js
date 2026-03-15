@@ -9,6 +9,7 @@ const hospitalSchema = new mongoose.Schema({
     // Use Number for these flat fields from your JSON/Compass
     latitude: { type: Number, required: true }, 
     longitude: { type: Number, required: true },
+    image: { type: String },
     phone_number: String,
     email: String,
     website: String,

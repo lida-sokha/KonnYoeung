@@ -33,7 +33,8 @@ import CreateUser from './pages/Admin/Create_user';
 import ManageArticle from './pages/Admin/Article/ManageArticle';
 import AdminPreview from './pages/Admin/Article/AdminPreview';
 import ArticleEditor from './pages/Admin/Article/ArticleEditor';
-
+import ManageHospital from './pages/Admin/Hospital/ManageHospital';
+import AddHospital from './pages/Admin/Hospital/AddHospital';
 function AppContent() {
   return (
     <Routes>
@@ -179,6 +180,22 @@ function AppContent() {
             <ArticleEditor/>
         </AdminRoute>
       }
+      />
+      <Route 
+        path='/admin/hospitals'
+        element={
+          <AdminRoute>
+            <ManageHospital/>
+        </AdminRoute>
+      }
+      />
+      <Route
+        path='/admin/AddHospital'
+        element={
+          <AdminRoute>
+            <AddHospital/>
+          </AdminRoute>
+        }
       />
     </Routes>
   );

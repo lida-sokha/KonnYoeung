@@ -2,8 +2,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require("../models/User");
 const Article = require("../models/Article");
+const Hospital = require("../models/Hospital");
 const Counter = require('../models/Counter');  
 const cloudinary = require('cloudinary').v2;
+const mongoose = require('mongoose');
 
 exports.getAllUser = async (req, res) => {
     try {
@@ -313,5 +315,103 @@ exports.updateArticle = async (req, res) => {
     } catch (error) {
         console.error("SERVER ERROR DURING UPDATE:", error);
         res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+exports.getallHospital = async (req, res) => {
+    try {
+        const hospitals = await Hospital.find();
+        res.status(200).json({
+            success: true,
+            count: hospitals.length,
+            data: hospitals
+        });
+    } catch (error) {
+         console.error("Error fetching hospitals:", error);
+        res.status(500).json({
+            success: false,
+            error: "Server Error: Could not fetch hospital"
+        });
+    }
+}
+
+
+exports.AddHospital = async (req, res) => {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_NAME,
+        api_key: process.env.CLOUDINARY_KEY,
+        api_secret: process.env.CLOUDINARY_SECRET
+    });
+
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: "Image is required" });
+        }
+
+        const hospitalId = new mongoose.Types.ObjectId();
+
+        const fileBase64 = req.file.buffer.toString('base64');
+        const fileUri = `data:${req.file.mimetype};base64,${fileBase64}`;
+
+        const uploadRes = await cloudinary.uploader.upload(fileUri, {
+            folder: 'hospitals',
+            public_id: hospitalId.toString(), 
+            overwrite: true
+        });
+
+        const newHospital = new Hospital({
+            ...req.body,
+            _id: hospitalId, 
+            image: `hospitals/${hospitalId}`, 
+            latitude: Number(req.body.latitude),
+            longitude: Number(req.body.longitude),
+            is_24h_service: req.body.is_24h_service === 'true'
+        });
+
+        const savedHospital = await newHospital.save();
+
+        res.status(201).json({
+            success: true,
+            data: savedHospital
+        });
+
+    } catch (error) {
+        console.error("Backend Error:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+exports.DeleteHospital = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const hospital = await Hospital.findById(id);
+
+        if (!hospital) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Hospital not found" 
+            });
+        }
+
+        try {
+            await cloudinary.uploader.destroy(`hospitals/${id}`);
+        } catch (cloudinaryErr) {
+            console.error("Cloudinary error (non-fatal):", cloudinaryErr);
+        }
+
+        await Hospital.findByIdAndDelete(id);
+
+        res.status(200).json({
+            success: true,
+            message: "Hospital and associated image deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Delete Controller Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            error: error.message 
+        });
     }
 };

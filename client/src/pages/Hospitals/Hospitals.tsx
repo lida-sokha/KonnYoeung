@@ -9,6 +9,7 @@ interface Hospital {
   address: string;
   latitude: number;  
   longitude: number;
+  image?: string;
 }
 const Hospital = () => {
     const [hospitals, setHospitals] = useState<Hospital[]>([]);
@@ -51,20 +52,6 @@ const Hospital = () => {
     );
   };
 
-    useEffect(() => {
-        const fetchHospital = async () => {
-            try {
-                const response = await API.get("/hospitals");
-                setHospitals(response.data);
-            } catch (err: any) {
-                console.error("Fetch error:", err);
-                setError("The server encountered an error. Check backend logs.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchHospital();
-    }, []);
 
   const filteredHospital = hospitals.filter((h) =>
   h.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -83,11 +70,28 @@ const Hospital = () => {
   };  
 
   // Helper to generate the Cloudinary URL
-  const getImageUrl = (hospitalId: string) => {
+// Update this function at the top of your component
+const getImageUrl = (hospital: any) => {
   const cloudName = "dprsygcvh";
+  const baseUrl = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto`;
   
- return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${hospitalId}.jpg`;
-  };
+  // 1. Get the ID string. If both are missing, use a placeholder string.
+  const imageId = hospital.image || hospital._id || "";
+
+  // 2. Add a safety check: if imageId is empty, return a placeholder image
+  if (!imageId) {
+    return "https://via.placeholder.com/400x300?text=No+Image+Available";
+  }
+
+  // 3. Logic: New images use a 24-char MongoDB ID in the 'hospitals' folder
+  // We use imageId.length safely now because we ensured it's at least an empty string
+  if (imageId.length === 24) {
+    return `${baseUrl}/hospitals/${imageId}`;
+  }
+
+  // 4. Fallback for old images in root
+  return `${baseUrl}/${imageId}.jpg`;
+};
   
     if (loading) return <div className="text-center p-10 font-bold">Loading...</div>; 
     
@@ -123,16 +127,16 @@ const Hospital = () => {
         <div className="container mx-auto p-6">
         {filteredHospital.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentHospitals.map((hospital) => (
-              <HospitalCard
+           {currentHospitals.map((hospital) => (
+            <HospitalCard
               key={hospital._id}
               id={hospital._id}
               name={hospital.name}
               address={hospital.address}
-              image={getImageUrl(hospital._id)}
+              image={hospital.image} 
               isSaved={savedIds.includes(hospital._id)} 
               onSaveToggle={handleSaveToggle}
-                />
+            />
           ))}
         </div>
           

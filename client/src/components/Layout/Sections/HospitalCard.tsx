@@ -16,15 +16,25 @@ interface HospitalProps {
 const HospitalCard = ({
   id,
   name,
+  image,
   address,
   distance,
   isSaved,
   onSaveToggle,
 }: HospitalProps) => {
-  const getImageUrl = (hospitalId: string) => {
-    const cloudName = "dprsygcvh";
-    return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${hospitalId}.jpg`;
+const getImageUrl = (imageField: string | undefined, hospitalId: string) => {
+  const cloudName = "dprsygcvh";
+  const baseUrl = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto`;
+
+  // If the image field exists (e.g., "hospitals/69b6...")
+  if (imageField) {
+    return `${baseUrl}/${imageField}.jpg`;
   }
+
+  // If image field is missing, try to see if an old root image exists using the ID
+  // If this also fails, the 'onError' in your <img> tag will show the fallback building
+  return `${baseUrl}/${hospitalId}.jpg`;
+};
   const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=500";
 
   const handleSaveToggle = async (hospitalId: string) => {
@@ -46,8 +56,8 @@ const HospitalCard = ({
       <Link to={`/hospitals/${id}`} className="flex flex-col flex-1">
         {/* Image Section */}
         <div className="relative h-48 w-full">
-          <img
-            src={getImageUrl(id)}
+         <img
+            src={getImageUrl(image, id)} // Use both here
             alt={name}
             className="w-full h-full object-cover"
             onError={(e) => {
