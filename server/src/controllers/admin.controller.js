@@ -415,3 +415,66 @@ exports.DeleteHospital = async (req, res) => {
         });
     }
 };
+exports.UpdateHospital = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        let hospital = await Hospital.findById(id);
+        if (!hospital) {
+            return res.status(404).json({ success: false, message: "Hospital not found" });
+        }
+
+        let updateData = {
+            ...req.body,
+            latitude: req.body.latitude ? Number(req.body.latitude) : hospital.latitude,
+            longitude: req.body.longitude ? Number(req.body.longitude) : hospital.longitude,
+            is_24h_service: req.body.is_24h_service === 'true'
+        };
+
+        if (req.file) {
+            const fileBase64 = req.file.buffer.toString('base64');
+            const fileUri = `data:${req.file.mimetype};base64,${fileBase64}`;
+
+            await cloudinary.uploader.upload(fileUri, {
+                folder: 'hospitals',
+                public_id: id, 
+                overwrite: true
+            });
+            
+            updateData.image = `hospitals/${id}`;
+        }
+
+        const updatedHospital = await Hospital.findByIdAndUpdate(
+            id, 
+            { $set: updateData }, 
+            { new: true, runValidators: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Hospital updated successfully",
+            data: updatedHospital
+        });
+
+    } catch (error) {
+        console.error("Update Error:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+exports.getHospitalById = async (req, res) => {
+    try {
+        const hospital = await Hospital.findById(req.params.id);
+        
+        if (!hospital) {
+            return res.status(404).json({ success: false, message: "Hospital not found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: hospital
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};

@@ -9,7 +9,7 @@ const upload = multer({
 });
 const {
     getAllUser, createUser, deleteUser, createArticle, getallArticle, getArticleById, deleteArticle, updateArticle, getallHospital,
-    AddHospital, DeleteHospital
+    AddHospital, DeleteHospital, UpdateHospital, getHospitalById
 } = require('../controllers/admin.controller');
 
 /**
@@ -469,4 +469,91 @@ router.post("/hospitals", upload.single('image'), AddHospital);
  *         description: Server error
  */
 router.delete('/hospitals/:id', DeleteHospital);
+
+
+/**
+ * @swagger
+ * /api/admin/hospitals/{id}:
+ *   put:
+ *     summary: Update an existing hospital
+ *     tags: [Admin]
+ *     description: Update hospital information and optionally upload a new image.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the hospital to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               type:
+ *                 type: string
+ *                 enum: [Public, Private]
+ *               province:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               latitude:
+ *                 type: number
+ *               longitude:
+ *                 type: number
+ *               phone_number:
+ *                 type: string
+ *               is_24h_service:
+ *                 type: boolean
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Optional new hospital image
+ *     responses:
+ *       200:
+ *         description: Hospital updated successfully
+ *       404:
+ *         description: Hospital not found
+ *       500:
+ *         description: Server error
+ */
+router.put('/hospitals/:id', upload.single('image'), UpdateHospital);
+
+/**
+ * @swagger
+ * /api/admin/hospitals/{id}:
+ *   get:
+ *     summary: Get a single hospital by ID
+ *     tags: [Admin]
+ *     description: Retrieve detailed information about a specific hospital for editing or viewing.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the hospital to retrieve
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Hospital details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/Hospital'
+ *       404:
+ *         description: Hospital not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/hospitals/:id', getHospitalById);
 module.exports = router;

@@ -35,6 +35,7 @@ import AdminPreview from './pages/Admin/Article/AdminPreview';
 import ArticleEditor from './pages/Admin/Article/ArticleEditor';
 import ManageHospital from './pages/Admin/Hospital/ManageHospital';
 import AddHospital from './pages/Admin/Hospital/AddHospital';
+import EditHospital from './pages/Admin/Hospital/HospitalEditor';
 function AppContent() {
   return (
     <Routes>
@@ -194,6 +195,14 @@ function AppContent() {
         element={
           <AdminRoute>
             <AddHospital/>
+          </AdminRoute>
+        }
+      />
+      <Route 
+        path='/admin/EditHospital/:id'
+        element={
+          <AdminRoute>
+            <EditHospital/>
           </AdminRoute>
         }
       />
