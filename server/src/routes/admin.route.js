@@ -9,7 +9,7 @@ const upload = multer({
 });
 const {
     getAllUser, createUser, deleteUser, createArticle, getallArticle, getArticleById, deleteArticle, updateArticle, getallHospital,
-    AddHospital, DeleteHospital, UpdateHospital, getHospitalById
+    AddHospital, DeleteHospital, UpdateHospital, getHospitalById, getDashboardStats, getRecentActivities
 } = require('../controllers/admin.controller');
 
 /**
@@ -556,4 +556,44 @@ router.put('/hospitals/:id', upload.single('image'), UpdateHospital);
  *         description: Server error
  */
 router.get('/hospitals/:id', getHospitalById);
+
+/**
+ * @swagger
+ * /api/admin/stats:
+ *   get:
+ *     summary: Get dashboard statistics counts
+ *     tags: [Admin]
+ *     description: Retrieve total counts for users, hospitals, diseases, and articles used in the admin dashboard.
+ *     responses:
+ *       200:
+ *         description: Statistics retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     users:
+ *                       type: integer
+ *                       example: 120
+ *                     hospitals:
+ *                       type: integer
+ *                       example: 35
+ *                     diseases:
+ *                       type: integer
+ *                       example: 60
+ *                     articles:
+ *                       type: integer
+ *                       example: 80
+ *       500:
+ *         description: Server error
+ */
+router.get('/stats', getDashboardStats);
+
+router.get('/Activity', getRecentActivities);
 module.exports = router;

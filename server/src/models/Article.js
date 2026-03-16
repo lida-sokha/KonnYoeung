@@ -17,13 +17,13 @@ const ArticleSchema = new mongoose.Schema({
         required: true,
     }],
 
-    content_block: [{
+    content_blocks: [{
         _id: false,
         content_order: Number,
         content_type: {
             type: String,
             required: true,
-            enum: ['parapragh', 'Image', 'Header', 'List']
+            enum: ['Parapragh', 'Image', 'Header', 'List']
         },
         // For text content (Paragraphs, Headers, Lists)
         content: { type: String },
