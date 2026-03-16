@@ -40,33 +40,49 @@ const ManageHospital = () => {
     const filteredHospitals = hospitals.filter((h) =>
         h.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const handleDelete = async (hospitalId: string) => {
-    if (!window.confirm("Are you sure you want to delete this hospital? This will also remove the image from Cloudinary.")) {
-      return;
-    }
-
-    try {
-      const response = await API.delete(`/admin/hospitals/${hospitalId}`);
-
-      if (response.data.success) {
-        toast.success("Hospital deleted successfully");
-        
-        setHospitals((prev) => prev.filter((h) => h._id !== hospitalId));
-      }
-    } catch (error: any) {
-      console.error("Delete Error:", error);
-      toast.error(error.response?.data?.message || "Failed to delete hospital");
-        }
-  };
-
-    const handleEdite = async (hospitalId: string) => {
+const handleDelete = async (hospitalId: string) => {
+    const loadingToast = toast.loading("Deleting article...");
         try {
-            const response = await API.get(`/admin/hospitals/${hospitalId}`);
-    }catch (error: any) {
-      console.error("Can't got the the edit page:", error);
-      toast.error(error.response?.data?.message || "Failed to go to the edit page");
+            const response = await API.delete(`/admin/hospitals/${hospitalId}`);
+            if (response.data.success) {
+                setHospitals((prev) => prev.filter((h) => h._id !== hospitalId));
+                toast.success("Hospital deleted successfully!", { id: loadingToast });
+            }
+        } catch (error:any) {
+            toast.error(error.response?.data?.message || "Failed to delete hospital");
+    }
+    };
+    const confirmDelete = (id: string) => {
+        toast((t) => (
+            <div className="flex flex-col gap-3 p-1">
+                <span className="text-sm font-medium text-gray-800">
+                    Delete this hospital? This cannot be undone.
+                </span>
+                <div className="flex gap-2 justify-end">
+                    <button
+                        onClick={() => toast.dismiss(t.id)}
+                        className="px-3 py-1.5 text-xs font-semibold text-gray-500 hover:bg-gray-100 rounded-lg transition"
+                    >
+                        cancel
+                    </button>
+                    <button
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            handleDelete(id);
+                        }}
+                        className="px-3 py-1.5 text-xs font-semibold bg-red-500 text-white hover:bg-red-600 rounded-lg shadow-sm transition"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        ), {
+            duration: 3000,
+            position: 'top-center',
+            style: { minWidth: '300px', border: '1px solid #fee2e2' }
         }
-}
+        );
+    };
     return (
         <AdminDashboardLayout>
             <div className="p-6">
@@ -141,7 +157,7 @@ const ManageHospital = () => {
                                             <Edit size={18} />
                                             </button>
                                             <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                onClick={() => handleDelete(h._id!)}
+                                                onClick={() => confirmDelete(h._id!)}
                                             ><Trash2 size={18} /></button>
                                         </div>
                                     </td>

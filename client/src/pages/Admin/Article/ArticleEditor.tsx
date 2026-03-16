@@ -17,8 +17,8 @@ const ArticleEditor = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   
-  type ContentBlock =
-    | { type: "paragraph"; text: string; order: number }
+  type ContentBlock=
+    | { type: "parapragh"; text: string; order: number }
     | { type: "header"; text: string; order: number }
     | { type: "image"; file: File | null; preview: string | null; order: number }
     | { type: "bullet"; items: string[]; order: number };
@@ -47,7 +47,7 @@ useEffect(() => {
         const safeCategories = Array.isArray(art.categories) ? art.categories : [];
         setCategories(safeCategories);
         
-        const rawBlocks = art.content_blocks || [];
+        const rawBlocks = art.content_blocks || art.content_block || [];
         const mappedContent = rawBlocks.map((block: any) => {
           const type = (block.content_type || "").toLowerCase();
           const common = { order: block.content_order || 0 };
@@ -58,10 +58,9 @@ useEffect(() => {
           if (type === 'bullet') {
             return { ...common, type: "bullet", items: block.items || [] };
           }
-          
           return { 
             ...common, 
-            type: (type === "parapragh" || type === "paragraph") ? "paragraph" : "header", 
+            type: (type === "parapragh" || type === "paragraph") ? "parapragh" : "header", 
             text: block.content || "" 
           };
         });
@@ -94,33 +93,27 @@ const handleSave = async (targetStatus?: string) => {
     formData.append("publish_date", date);
     
     formData.append("categories", JSON.stringify(categories));
+// Inside handleSave function
 const contentBlockData = content.map((block, index) => {
-  const base = { 
-    content_order: index + 1, 
-  };
-
-  let typeMapping = "";
-  if (block.type === "paragraph") typeMapping = "parapragh";
-  else if (block.type === "image") typeMapping = "Image";
-  else if (block.type === "header") typeMapping = "Header";
-  else if (block.type === "bullet") typeMapping = "List";
+  const base = { content_order: index + 1 };
 
   if (block.type === "image") {
     return { ...base, content_type: "Image", image_url: block.file ? null : block.preview };
   }
   
   if (block.type === "bullet") {
-    return { ...base, content_type: "List", content: block.items?.join("\n") || "" };
+    return { ...base, content_type: "List", content: block.items?.join(";") || "" };
   }
   
   return { 
-    ...base, 
-    content_type: typeMapping, 
-    content: (block as any).text || "" 
-  };
+        ...base, 
+        content_type: block.type === "parapragh" ? "Parapragh" : "Header", 
+        content: (block as any).text || "" 
+      };
 });
 
-formData.append("content_block", JSON.stringify(contentBlockData));
+// CHANGE THIS FROM 'content_block' TO 'content_blocks'
+formData.append("content_blocks", JSON.stringify(contentBlockData));
 
     content.forEach((block) => {
       if (block.type === "image" && block.file) {
@@ -161,7 +154,7 @@ formData.append("content_block", JSON.stringify(contentBlockData));
 
   const addBlock = (type: ContentBlock["type"]) => {
     const order = content.length + 1;
-    if (type === "paragraph") setContent([...content, { type: "paragraph", text: "", order }]);
+    if (type === "parapragh") setContent([...content, { type: "parapragh", text: "", order }]);
     if (type === "header") setContent([...content, { type: "header", text: "", order }]);
     if (type === "image") setContent([...content, { type: "image", file: null, preview: null, order }]);
     if (type === "bullet") setContent([...content, { type: "bullet", items: [""], order }]);
@@ -214,7 +207,7 @@ formData.append("content_block", JSON.stringify(contentBlockData));
         {/* TOOLBAR */}
         <div className="sticky top-6 z-30 flex items-center gap-2 mb-10 p-2 bg-white/90 backdrop-blur-md border border-gray-100 shadow-xl rounded-2xl w-fit mx-auto">
           <button onClick={() => addBlock("header")} className="p-3 rounded-xl hover:bg-blue-50 text-blue-600 transition-all flex items-center gap-2 text-sm font-bold"><Heading size={20}/> Header</button>
-          <button onClick={() => addBlock("paragraph")} className="p-3 rounded-xl hover:bg-emerald-50 text-emerald-600 transition-all flex items-center gap-2 text-sm font-bold"><Type size={20}/> Text</button>
+          <button onClick={() => addBlock("parapragh")} className="p-3 rounded-xl hover:bg-emerald-50 text-emerald-600 transition-all flex items-center gap-2 text-sm font-bold"><Type size={20}/> Text</button>
           <button onClick={() => addBlock("image")} className="p-3 rounded-xl hover:bg-purple-50 text-purple-600 transition-all flex items-center gap-2 text-sm font-bold"><ImageIcon size={20}/> Image</button>
           <button onClick={() => addBlock("bullet")} className="p-3 rounded-xl hover:bg-orange-50 text-orange-700 transition-all flex items-center gap-2 text-sm font-bold"><List size={20}/> List</button>
         </div>
@@ -236,7 +229,7 @@ formData.append("content_block", JSON.stringify(contentBlockData));
                 }} />
               )}
 
-              {block.type === "paragraph" && (
+              {block.type === "parapragh" && (
                 <textarea className="w-full text-lg leading-relaxed text-gray-600 outline-none resize-none bg-transparent" rows={3} value={block.text} onChange={(e) => {
                   const next = [...content];
                   (next[index] as any).text = e.target.value;
@@ -245,24 +238,37 @@ formData.append("content_block", JSON.stringify(contentBlockData));
               )}
 
               {block.type === "image" && (
-                 <div className="aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-100 hover:border-blue-200 transition-all relative">
-                    {block.preview ? (
-                        <img src={block.preview.startsWith("blob:") ? block.preview : `https://res.cloudinary.com/dprsygcvh/image/upload/f_auto,q_auto/${block.preview}`} className="w-full h-full object-cover" alt="Article" />
-                    ) : (
-                        <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
-                            <Plus size={40} className="text-gray-300 mb-2"/>
-                            <span className="text-gray-400 font-medium text-sm">Upload Image</span>
-                            <input type="file" hidden onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if(file) {
-                                    const next = [...content];
-                                    next[index] = {...block, file, preview: URL.createObjectURL(file)};
-                                    setContent(next);
-                                }
-                            }} />
-                        </label>
-                    )}
-                 </div>
+             <div className="aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-gray-100 hover:border-blue-200 transition-all relative">
+                  {block.preview ? (
+                    <img 
+                      src={(() => {
+                        if (block.preview.startsWith("blob:")) return block.preview;
+                        
+                        if (block.preview.startsWith("http")) return block.preview;
+                        
+                        return `https://res.cloudinary.com/dprsygcvh/image/upload/f_auto,q_auto/${block.preview}`;
+                      })()} 
+                      className="w-full h-full object-cover" 
+                      alt="Article" 
+                      onError={(e) => {
+                        e.currentTarget.src = "https://placehold.co/600x400?text=Image+Not+Found";
+                      }}
+                    />
+                  ) : (
+                    <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+                      <Plus size={40} className="text-gray-300 mb-2"/>
+                      <span className="text-gray-400 font-medium text-sm">Upload Image</span>
+                      <input type="file" hidden onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if(file) {
+                          const next = [...content];
+                          next[index] = {...block, file, preview: URL.createObjectURL(file)};
+                          setContent(next);
+                        }
+                      }} />
+                    </label>
+                  )}
+                </div>
               )}
 
               {block.type === "bullet" && (
