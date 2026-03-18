@@ -2,13 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../../services/api";
 import {  Mail, MessageCircle, ArrowRight } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-let DefaultIcon = L.icon({ iconUrl: icon, shadowUrl: iconShadow, iconSize: [25, 41], iconAnchor: [12, 41] });
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const HospitalDetail = () => {
   const { id } = useParams(); // Gets the ID from the URL
@@ -18,7 +11,6 @@ const HospitalDetail = () => {
   useEffect(() => {
     const fetchDetail = async () => {
       try {
-        // Ensure your backend has a GET /hospitals/:id route
         const response = await API.get(`/hospitals/${id}`);
         setHospital(response.data);
       } catch (err) {
@@ -43,10 +35,7 @@ const HospitalDetail = () => {
  return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${hospitalId}.jpg`;
   };
 
-const position: [number, number] = [
-  parseFloat(hospital.latitude) || 11.5564, 
-  parseFloat(hospital.longitude) || 104.9282
-];
+
   if (!hospital) return <div>Hospital not found.</div>;
 
   return (
@@ -94,21 +83,27 @@ const position: [number, number] = [
             </p>
         </div>
       </div>
-      <div className="rounded-3xl overflow-hidden shadow-md border border-gray-200 h-100 z-0 mb-10">
-        <MapContainer center={position} zoom={16} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
-          <TileLayer
-            attribution='&copy; OpenStreetMap contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <Marker position={position}>
-            <Popup>
-              <div className="font-sans">
-                <strong className="text-blue-600">{hospital.name}</strong><br />
-                {hospital.address}
-              </div>
-            </Popup>
-          </Marker>
-        </MapContainer>
+      {/* Auto-generated Google Map using Coordinates */}
+      <div className="relative rounded-3xl overflow-hidden shadow-md border border-gray-200 h-100 z-0 mb-10">
+        <a href={`https://www.google.com/maps/search/?api=1&query=${hospital.latitude},${hospital.longitude}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute inset-0 z-10 cursor-pointer"
+          title="Click to open in Google Maps"
+        >
+          <div className="absolute bottom-4 right-4 bg-white/90 px-4 py-2 rounded-full text-xs font-bold text-blue-600 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+          Open in Google Maps
+        </div>
+        </a>
+        <iframe
+          width="100%"
+          height="100%"
+          style={{ border: 0 }}
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
+          src={`https://www.google.com/maps?q=${hospital.latitude},${hospital.longitude}&hl=es;z=14&output=embed`}
+        ></iframe>
       </div>
     </div>
   );
