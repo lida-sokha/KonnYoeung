@@ -29,12 +29,16 @@ const HospitalDetail = () => {
     </div>
   );
   }
-  const getImageUrl = (hospitalId: string) => {
+const getImageUrl = (imageField: string | undefined, hospitalId: string) => {
   const cloudName = "dprsygcvh";
-  
- return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${hospitalId}.jpg`;
-  };
+  const baseUrl = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto`;
 
+  if (imageField) {
+    return `${baseUrl}/${imageField}`;
+  }
+
+  return `${baseUrl}/${hospitalId}.jpg`;
+};
 
   if (!hospital) return <div>Hospital not found.</div>;
 
@@ -47,10 +51,23 @@ const HospitalDetail = () => {
         <h1 className="w-full text-center text-2xl font-bold text-gray-800 justify-center">{hospital.name}</h1>
       </div>
       <div className="relative h-64 md:h-100 w-full mb-6">
-        <img 
-          src={getImageUrl(hospital._id)} 
-          alt={hospital.name} 
-          className="w-full h-full object-cover rounded-3xl shadow-lg" 
+           <img
+          src={getImageUrl(hospital.image, hospital._id)}
+          alt={hospital.name}
+          className="w-full h-full object-cover rounded-3xl shadow-lg"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.dataset.retried) {
+              target.dataset.retried = "true";
+              setTimeout(() => {
+                const freshUrl = getImageUrl(hospital.image, hospital._id);
+                target.src = `${freshUrl}${freshUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
+              }, 2000);
+            } else {
+              // If the retry also fails, show the fallback building
+              target.src = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=800";
+            }
+          }}
         />
       </div>
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6">
