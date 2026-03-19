@@ -596,6 +596,54 @@ router.get('/hospitals/:id', getHospitalById);
 router.get('/stats', getDashboardStats);
 
 router.get('/Activity', getRecentActivities);
-
+/**
+ * @swagger
+ * /api/admin/activity-chart:
+ *   get:
+ *     summary: Get activity chart data for the last 7 days
+ *     tags: [Admin]
+ *     description: Returns the number of hospitals added, articles published, and user registrations grouped by date for the past 7 days.
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved chart data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       date:
+ *                         type: string
+ *                         example: "2026-03-10"
+ *                       hospitals:
+ *                         type: integer
+ *                         example: 2
+ *                       articles:
+ *                         type: integer
+ *                         example: 5
+ *                       users:
+ *                         type: integer
+ *                         example: 10
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
 router.get('/activity-chart', getActivityChartData);
 module.exports = router;
