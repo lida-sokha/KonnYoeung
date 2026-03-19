@@ -3,6 +3,7 @@ import { Search, ArrowRight } from "lucide-react";
 import API from "../../services/api";
 import HospitalCard from "../../components/Layout/Sections/HospitalCard";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import useUserLocation from "../AskForLocation/UserLocation";
 interface Hospital {
   _id: string;
   name: string;
@@ -21,17 +22,17 @@ const Hospital = () => {
   const itemsPerpage = 6;
   const [savedIds, setSavedIds] = useState<string[]>([]); 
 
+  // 2. Initialize the location hook here. 
+  // This triggers the "Allow Location" prompt in Microsoft Edge.
+  const { position, error: locationError } = useUserLocation();
   useEffect(() => {
     const fetchHospitalData = async () => {
       try {
-        // 1. Fetch all hospitals
         const hospitalRes = await API.get("/hospitals");
         
-        // 2. Fetch user's saved hospitals to mark them
         const userRes = await API.get("users/check-auth");
         
         if (userRes.data.success) {
-          // Store only the IDs for quick comparison
           const ids = userRes.data.user.savedHospitals.map((h: any) => h._id || h);
           setSavedIds(ids);
         }
@@ -69,29 +70,6 @@ const Hospital = () => {
   setCurrentPage(1); 
   };  
 
-  // Helper to generate the Cloudinary URL
-// Update this function at the top of your component
-const getImageUrl = (hospital: any) => {
-  const cloudName = "dprsygcvh";
-  const baseUrl = `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto`;
-  
-  // 1. Get the ID string. If both are missing, use a placeholder string.
-  const imageId = hospital.image || hospital._id || "";
-
-  // 2. Add a safety check: if imageId is empty, return a placeholder image
-  if (!imageId) {
-    return "https://via.placeholder.com/400x300?text=No+Image+Available";
-  }
-
-  // 3. Logic: New images use a 24-char MongoDB ID in the 'hospitals' folder
-  // We use imageId.length safely now because we ensured it's at least an empty string
-  if (imageId.length === 24) {
-    return `${baseUrl}/hospitals/${imageId}`;
-  }
-
-  // 4. Fallback for old images in root
-  return `${baseUrl}/${imageId}.jpg`;
-};
   
     if (loading) return <div className="text-center p-10 font-bold">Loading...</div>; 
     
@@ -108,6 +86,11 @@ const getImageUrl = (hospital: any) => {
       <p className="flex item-center justify-center text-gray-400">
         Find your nearest hospital
       </p>
+      {locationError && !position && (
+        <div className="max-w-2xl mx-auto mt-4 p-3 bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-xl text-center">
+          Location access is turned off. Please enable it in your browser settings to see distances.
+        </div>
+      )}
       <div className="container mx-auto px-6 mt-6 ">
         <div className="max-w-2xl mx-auto relative group">
           <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
@@ -134,6 +117,9 @@ const getImageUrl = (hospital: any) => {
               name={hospital.name}
               address={hospital.address}
               image={hospital.image} 
+              latitude={hospital.latitude}
+              longitude={hospital.longitude}
+              userLocation={position}
               isSaved={savedIds.includes(hospital._id)} 
               onSaveToggle={handleSaveToggle}
             />

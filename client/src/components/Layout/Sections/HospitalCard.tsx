@@ -1,14 +1,15 @@
 import { MapPin, Navigation, Bookmark } from "lucide-react";
 import API from '../../../services/api';
 import { Link } from 'react-router-dom';
-import { useEffect } from "react";
-
+import calculateDistance from "../../../utils/CalculateDistance";
 interface HospitalProps {
   id: string;
   name: string;
   image?: string;
   address?: string;
-  distance?: string;
+  latitude?: number; 
+  longitude?: number;
+  userLocation?: { lat: number; lng: number } | null;
   isSaved?: boolean;
   onSaveToggle?: (id: string) => void;
 }
@@ -18,7 +19,7 @@ const HospitalCard = ({
   name,
   image,
   address,
-  distance,
+  latitude, longitude, userLocation,
   isSaved,
   onSaveToggle,
 }: HospitalProps) => {
@@ -31,8 +32,6 @@ const getImageUrl = (imageField: string | undefined, hospitalId: string) => {
     return `${baseUrl}/${imageField}.jpg`;
   }
 
-  // If image field is missing, try to see if an old root image exists using the ID
-  // If this also fails, the 'onError' in your <img> tag will show the fallback building
   return `${baseUrl}/${hospitalId}.jpg`;
 };
   const fallbackImage = "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=500";
@@ -49,15 +48,26 @@ const getImageUrl = (imageField: string | undefined, hospitalId: string) => {
       alert(errorMsg);
     }
   };
+const getDistanceDisplay = () => {
+    if (!userLocation || !latitude || !longitude) {
+      return "Checking distance...";
+    }
 
+    const d = calculateDistance(
+      userLocation.lat,
+      userLocation.lng,
+      latitude,
+      longitude
+    );
+    return `${d} Km from you`;
+  };
+  
   return (
     <div className="bg-white rounded-[24px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all overflow-hidden flex flex-col">
-      {/* Link starts here - wraps Image and Info */}
       <Link to={`/hospitals/${id}`} className="flex flex-col flex-1">
-        {/* Image Section */}
         <div className="relative h-48 w-full">
          <img
-            src={getImageUrl(image, id)} // Use both here
+            src={getImageUrl(image, id)} 
             alt={name}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -85,7 +95,7 @@ const getImageUrl = (imageField: string | undefined, hospitalId: string) => {
         <div className="flex items-center gap-2 text-gray-400">
           <Navigation size={16} className="rotate-45" />
           <span className="text-sm font-medium">
-            {distance || "1"} km from you
+            {getDistanceDisplay()} from you
           </span>
         </div>
 
