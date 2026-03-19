@@ -572,13 +572,57 @@ exports.getRecentActivities = async (req, res) => {
         const activities = await Activity.find()
             .sort({ createdAt: -1 })
             .limit(10)
-            .populate('user', 'fullName')   // Check: Does User model have 'fullName'?
-            .populate('hospital', 'name')   // Check: Does Hospital model have 'name'?
-            .populate('article', 'article_title'); // Check: Does Article model have 'article_title'?
+            .populate('user', 'fullName')   
+            .populate('hospital', 'name')   
+            .populate('article', 'article_title'); 
 
         res.status(200).json({ success: true, data: activities });
     } catch (error) {
-        console.error("GET ACTIVITIES ERROR:", error); // Check your VS CODE TERMINAL for this!
+        console.error("GET ACTIVITIES ERROR:", error); 
         res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+exports.getActivityChartData = async (req, res) => {
+    try {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const chartData = await Activity.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: sevenDaysAgo }
+                }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    hospitals: { 
+                        $sum: { $cond: [{ $eq: ["$type", "hospital_added"] }, 1, 0] } 
+                    },
+                    articles: { 
+                        $sum: { $cond: [{ $eq: ["$type", "article_published"] }, 1, 0] } 
+                    },
+                    users: { 
+                        $sum: { $cond: [{ $eq: ["$type", "registration"] }, 1, 0] } 
+                    }
+                }
+            },
+            { $sort: { "_id": 1 } },
+            {
+                $project: {
+                    _id: 0,
+                    date: "$_id", 
+                    hospitals: 1,
+                    articles: 1,
+                    users: 1
+                }
+            }
+        ]);
+
+        res.status(200).json({ success: true, data: chartData });
+    } catch (error) {
+        console.error("Aggregation Error:", error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };

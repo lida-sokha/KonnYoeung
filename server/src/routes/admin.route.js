@@ -9,7 +9,7 @@ const upload = multer({
 });
 const {
     getAllUser, createUser, deleteUser, createArticle, getallArticle, getArticleById, deleteArticle, updateArticle, getallHospital,
-    AddHospital, DeleteHospital, UpdateHospital, getHospitalById, getDashboardStats, getRecentActivities
+    AddHospital, DeleteHospital, UpdateHospital, getHospitalById, getDashboardStats, getRecentActivities, getActivityChartData
 } = require('../controllers/admin.controller');
 
 /**
@@ -596,4 +596,6 @@ router.get('/hospitals/:id', getHospitalById);
 router.get('/stats', getDashboardStats);
 
 router.get('/Activity', getRecentActivities);
+
+router.get('/activity-chart', getActivityChartData);
 module.exports = router;
