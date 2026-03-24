@@ -111,7 +111,7 @@ const executeDelete = async (id: string) => {
         {/* Header Section */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Manage Articles</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Manage Articles</h1>
             <p className="text-gray-500 text-m">Create, edit, and manage your content</p>
           </div>
           <button
