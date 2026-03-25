@@ -7,7 +7,8 @@ from flask import Flask, request, jsonify
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
-from imblearn.combine import SMOTEENN
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
 
 
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -47,26 +48,24 @@ SYMPTOM_ALIASES = {
 
 
 def train_and_save_logistic_model(
-    data_path=os.path.join(ROOT_DIR, "data", "feature_selection", "final_dataset.csv"),
+    data_path=os.path.join(THIS_DIR, "final_dataset.csv"),
     save_dir=SAVE_DIR,
     model_file=MODEL_FILE,
     label_encoder_file=LABEL_ENCODER_FILE,
     symptom_columns_file=SYMPTOM_COLUMNS_FILE,
-    min_samples_class=50,
+    target_per_class=300,
     random_state=42,
 ):
     df = pd.read_csv(data_path)
     df["prognosis"] = df["prognosis"].str.replace(" ", "_")
-
-    class_counts = df["prognosis"].value_counts()
-    valid_classes = class_counts[class_counts >= min_samples_class].index
-    df = df[df["prognosis"].isin(valid_classes)]
 
     feature_cols = [c for c in df.columns if c != "prognosis"]
     zero_cols = df[feature_cols].columns[df[feature_cols].sum(axis=0) == 0].tolist()
     df.drop(columns=zero_cols, inplace=True)
 
     X = df.drop(columns=["prognosis"])
+
+    # Feature order must be stable for prediction.
     symptom_columns = X.columns.tolist()
 
     le = LabelEncoder()
@@ -76,8 +75,26 @@ def train_and_save_logistic_model(
         X, y, test_size=0.2, random_state=random_state, stratify=y
     )
 
-    smoteenn = SMOTEENN(random_state=random_state)
-    X_train_bal, y_train_bal = smoteenn.fit_resample(X_train, y_train)
+    # Match your notebook approach:
+    # 1) Under-sample classes > target_per_class to exactly target_per_class
+    current_counts = pd.Series(y_train).value_counts()
+    classes_to_under = {
+        cls: target_per_class
+        for cls, count in current_counts.items()
+        if count > target_per_class
+    }
+    if classes_to_under:
+        under_sampler = RandomUnderSampler(
+            sampling_strategy=classes_to_under, random_state=random_state
+        )
+        X_train_under, y_train_under = under_sampler.fit_resample(X_train, y_train)
+    else:
+        X_train_under, y_train_under = X_train, y_train
+
+    # 2) Over-sample all classes to exactly target_per_class using SMOTE
+    smote_sampling_strategy = {class_: target_per_class for class_ in np.unique(y_train_under)}
+    smote = SMOTE(random_state=random_state, sampling_strategy=smote_sampling_strategy)
+    X_train_bal, y_train_bal = smote.fit_resample(X_train_under, y_train_under)
 
     model = LogisticRegression(max_iter=1000, random_state=random_state)
     model.fit(X_train_bal, y_train_bal)

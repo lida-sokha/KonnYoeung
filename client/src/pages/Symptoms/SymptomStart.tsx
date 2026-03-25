@@ -148,17 +148,18 @@ const SymptomStart = () => {
   return (
     <DashboardLayout>
       <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-2xl mx-auto">
-        <Link
-          to="/symptoms"
-          className="inline-flex items-center text-sm text-[#34AADC] hover:underline mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Link>
-
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-center">
-          Check Symptom
-        </h1>
+        <div className="relative mb-8 flex min-h-[2.75rem] items-center justify-center">
+          <Link
+            to="/symptoms"
+            className="absolute left-0 top-1/2 inline-flex -translate-y-1/2 items-center text-sm text-[#34AADC] hover:underline"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
+            Back
+          </Link>
+          <h1 className="text-center text-2xl font-bold text-gray-800 md:text-3xl">
+            Check Symptom
+          </h1>
+        </div>
 
         {/* Step 1: Gender + Province */}
         {step === 1 && (
