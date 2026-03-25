@@ -1,38 +1,17 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
 import { initialDiseases, type Disease } from "../../contexts/DiseaseContext";
+import API from "../../services/api";
 
-const SYMPTOM_KEYWORDS: Record<string, string[]> = {
-  cough: ["cough"],
-  fever: ["fever"],
-  headache: ["headache", "head"],
-  joint_pain: ["joint", "pain"],
-  nausea: ["nausea"],
-  rash: ["rash", "itching"],
-  vomiting: ["vomit"],
-  weakness: ["weakness", "fatigue"],
-  weight_loss: ["weight", "loss"],
-  yellow_eyes: ["yellow", "eyes", "jaundice"],
+type MlPrediction = { disease: string; confidence: number };
+
+type MlResponse = {
+  predictions: MlPrediction[];
+  matched_symptoms: string[];
+  unmatched_symptoms: string[];
 };
-
-function matchDisease(selectedSymptoms: string[]): Disease | null {
-  if (selectedSymptoms.length === 0) return null;
-  let best: { disease: Disease; score: number } | null = null;
-  for (const disease of initialDiseases) {
-    const symptomText = disease.commonSymptoms.join(" ").toLowerCase();
-    let score = 0;
-    for (const key of selectedSymptoms) {
-      const keywords = SYMPTOM_KEYWORDS[key];
-      if (!keywords) continue;
-      if (keywords.some((kw) => symptomText.includes(kw))) score += 1;
-    }
-    if (score > 0 && (!best || score > best.score)) {
-      best = { disease, score };
-    }
-  }
-  return best ? best.disease : null;
-}
 
 const SEVERITY_IMAGES: Record<string, string> = {
   Mild: "/images/low_severity.png",
@@ -43,6 +22,25 @@ const SEVERITY_IMAGES: Record<string, string> = {
 
 function getSeverityImage(severity: string): string {
   return SEVERITY_IMAGES[severity] ?? "/images/moderate_severity.png";
+}
+
+function formatMlDiseaseLabel(raw: string): string {
+  return raw
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function findDiseaseForMlLabel(label: string): Disease | null {
+  const lower = label.toLowerCase();
+  const asHyphen = lower.replace(/_/g, "-");
+  return (
+    initialDiseases.find(
+      (d) =>
+        d.id === lower ||
+        d.id === asHyphen ||
+        d.name.toLowerCase().replace(/\s+/g, " ") === lower.replace(/_/g, " ")
+    ) ?? null
+  );
 }
 
 const FALLBACK_DISEASE: Disease = {
@@ -70,6 +68,18 @@ const FALLBACK_DISEASE: Disease = {
   ],
 };
 
+function resolvePrimaryDisease(mlTopLabel: string | null): Disease {
+  if (!mlTopLabel) return FALLBACK_DISEASE;
+  const found = findDiseaseForMlLabel(mlTopLabel);
+  if (found) return found;
+  return {
+    ...FALLBACK_DISEASE,
+    id: mlTopLabel,
+    name: formatMlDiseaseLabel(mlTopLabel),
+    description: `${FALLBACK_DISEASE.description} The symptom model suggests reviewing information related to ${formatMlDiseaseLabel(mlTopLabel)} with a healthcare professional.`,
+  };
+}
+
 const SymptomResult = () => {
   const location = useLocation();
   const state = location.state as {
@@ -79,7 +89,52 @@ const SymptomResult = () => {
     ageCategory?: string;
   } | null;
   const selectedSymptoms = Array.isArray(state?.selectedSymptoms) ? state.selectedSymptoms : [];
-  const disease = matchDisease(selectedSymptoms) ?? FALLBACK_DISEASE;
+
+  const [loading, setLoading] = useState(false);
+  const [mlData, setMlData] = useState<MlResponse | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedSymptoms.length === 0) {
+      setMlData(null);
+      setErrorMessage(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setErrorMessage(null);
+    setMlData(null);
+
+    API.post<MlResponse>("/symptoms/predict", { symptoms: selectedSymptoms, k: 3 })
+      .then((res) => {
+        if (!cancelled) {
+          setMlData(res.data);
+        }
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        const data = err.response?.data as
+          | { error?: string; unmatched_symptoms?: string[] }
+          | undefined;
+        const msg = data?.error || err.message || "Prediction request failed.";
+        let full = typeof msg === "string" ? msg : "Prediction request failed.";
+        if (data?.unmatched_symptoms?.length) {
+          full += ` Unmatched: ${data.unmatched_symptoms.join(", ")}.`;
+        }
+        setErrorMessage(full);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSymptoms]);
+
+  const topMlLabel = mlData?.predictions?.[0]?.disease ?? null;
+  const primaryDisease = resolvePrimaryDisease(topMlLabel);
 
   return (
     <DashboardLayout>
@@ -98,18 +153,18 @@ const SymptomResult = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">
-                Diseases: {disease.name}
+                Diseases: {loading ? "…" : primaryDisease.name}
               </h1>
               <p className="mt-4 text-gray-600 max-w-2xl">
-                {disease.description}
+                {primaryDisease.description}
               </p>
             </div>
 
             <div className="flex items-center justify-center md:justify-end">
               <div className="h-64 w-64 rounded-full bg-[#E3F5FF] flex items-center justify-center overflow-hidden">
                 <img
-                  src={getSeverityImage(disease.severity)}
-                  alt={`Severity: ${disease.severity}`}
+                  src={getSeverityImage(primaryDisease.severity)}
+                  alt={`Severity: ${primaryDisease.severity}`}
                   className="h-full w-full object-contain"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
@@ -123,7 +178,7 @@ const SymptomResult = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-gray-700">
-                Severity Level: <span className="font-semibold">{disease.severity}</span>
+                Severity Level: <span className="font-semibold">{primaryDisease.severity}</span>
               </p>
             </div>
             <div className="h-2 rounded-full bg-gradient-to-r from-green-400 via-yellow-300 to-red-400 relative">
@@ -131,16 +186,53 @@ const SymptomResult = () => {
                 className="absolute -top-1 h-4 w-4 rounded-full bg-white border border-gray-300 shadow-md"
                 style={{
                   left:
-                    disease.severity === "Mild"
+                    primaryDisease.severity === "Mild"
                       ? "16%"
-                      : disease.severity === "High"
+                      : primaryDisease.severity === "High"
                         ? "83%"
                         : "50%",
                   transform: "translateX(-50%)",
                 }}
               />
             </div>
-            <p className="mt-3 text-sm text-gray-600">{disease.summary}</p>
+            <p className="mt-3 text-sm text-gray-600">{primaryDisease.summary}</p>
+          </div>
+
+          <div className="rounded-3xl border border-indigo-100 bg-indigo-50 p-6 mb-6">
+            <h3 className="text-lg font-semibold text-indigo-700 mb-3">
+              3 Possible Diseases (model)
+            </h3>
+            {loading && (
+              <p className="text-sm text-gray-600">Loading predictions…</p>
+            )}
+            {!loading && errorMessage && (
+              <p className="text-sm text-red-700">{errorMessage}</p>
+            )}
+            {!loading && !errorMessage && mlData && mlData.predictions.length > 0 && (
+              <ul className="space-y-2 text-gray-700">
+                {mlData.predictions.map((item, index) => (
+                  <li
+                    key={`${item.disease}-${index}`}
+                    className="flex items-center justify-between rounded-xl bg-white px-4 py-3 border border-indigo-100"
+                  >
+                    <span className="font-medium">
+                      {index + 1}. {formatMlDiseaseLabel(item.disease)}
+                    </span>
+                    <span className="text-sm text-indigo-700">
+                      {(item.confidence * 100).toFixed(1)}% confidence
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {!loading && !errorMessage && selectedSymptoms.length === 0 && (
+              <p className="text-sm text-gray-600">No symptoms were submitted.</p>
+            )}
+            {mlData && mlData.matched_symptoms.length > 0 && (
+              <p className="mt-3 text-xs text-gray-500">
+                Matched to model: {mlData.matched_symptoms.join(", ").replace(/_/g, " ")}
+              </p>
+            )}
           </div>
 
           <h2 className="mt-8 mb-4 text-xl md:text-2xl font-semibold text-gray-800 text-center">
@@ -152,9 +244,9 @@ const SymptomResult = () => {
               <h3 className="text-lg font-semibold text-[#0070C9] mb-3">
                 Your child may experience:
               </h3>
-              {disease.commonSymptoms.length > 0 ? (
+              {primaryDisease.commonSymptoms.length > 0 ? (
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  {disease.commonSymptoms.map((item) => (
+                  {primaryDisease.commonSymptoms.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -170,7 +262,7 @@ const SymptomResult = () => {
                 When to Seek Medical Care
               </h3>
               <ul className="list-disc list-inside space-y-2 text-gray-700">
-                {disease.seekCareWhen.map((item) => (
+                {primaryDisease.seekCareWhen.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
@@ -182,7 +274,7 @@ const SymptomResult = () => {
               What You Should Do
             </h3>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              {disease.whatToDo.map((item) => (
+              {primaryDisease.whatToDo.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>

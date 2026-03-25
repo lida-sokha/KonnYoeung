@@ -8,6 +8,7 @@ const userRoutes = require("./src/routes/user.route.js");
 const hospitalRoutes = require("./src/routes/hospital.route.js");
 const articleRoutes = require("./src/routes/article.route.js");
 const adminRoutes = require("./src/routes/admin.route.js");
+const symptomRoutes = require("./src/routes/symptom.route.js");
 
 const app = express();
 app.use(cookieParser());
@@ -16,6 +17,13 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Symptom ML predict: no MongoDB required (Python + pickles).
+app.use("/api/symptoms", symptomRoutes);
+
+app.get("/", (req, res) => {
+  res.send("KonnYoeung Backend is Running!");
+});
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -30,11 +38,6 @@ mongoose.connect(process.env.MONGODB_URI)
     app.use('/api/hospitals', hospitalRoutes);
     app.use("/api/articles", articleRoutes);
     app.use("/api/admin",adminRoutes);
-
-    // Root
-    app.get("/", (req, res) => {
-      res.send("KonnYoeung Backend is Running!");
-    });
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
