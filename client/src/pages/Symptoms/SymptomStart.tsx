@@ -3,19 +3,67 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 7;
 
-const SYMPTOM_OPTIONS: { key: string; label: string }[] = [
-  { key: "cough", label: "Cough" },
-  { key: "fever", label: "Fever" },
-  { key: "headache", label: "Headache" },
-  { key: "joint_pain", label: "Joint pain" },
-  { key: "nausea", label: "Nausea" },
-  { key: "rash", label: "Rash" },
-  { key: "vomiting", label: "Vomiting" },
-  { key: "weakness", label: "Weakness" },
-  { key: "weight_loss", label: "Weight loss" },
-  { key: "yellow_eyes", label: "Yellow eyes" },
+type SymptomOption = { key: string; label: string };
+type SymptomGroup = { title: string; subtitle: string; symptoms: SymptomOption[] };
+
+const SYMPTOM_GROUPS: SymptomGroup[] = [
+  {
+    title: "Group 1: Respiratory",
+    subtitle: "(Breathing & Airways)",
+    symptoms: [
+      { key: "sore_throat", label: "Sore throat" },
+      { key: "nasal_congestion", label: "Nasal congestion" },
+      { key: "wheezing", label: "Wheezing" },
+      { key: "cough", label: "Cough" },
+      { key: "mucus_in_throat", label: "Mucus in throat" },
+      { key: "shortness_of_breath", label: "Shortness of breath" },
+    ],
+  },
+  {
+    title: "Group 2: General & Systemic",
+    subtitle: "(Whole-body condition)",
+    symptoms: [
+      { key: "fever", label: "Fever" },
+      { key: "weakness", label: "Weakness" },
+      { key: "headache", label: "Headache" },
+      { key: "joint_pain", label: "Joint pain" },
+      { key: "feel_cold", label: "Feel cold" },
+    ],
+  },
+  {
+    title: "Group 3: Gastrointestinal",
+    subtitle: "(Digestive system)",
+    symptoms: [
+      { key: "vomiting", label: "Vomiting" },
+      { key: "nausea", label: "Nausea" },
+      { key: "constipation", label: "Constipation" },
+      { key: "weight_loss", label: "Weight loss" },
+    ],
+  },
+  {
+    title: "Group 4: Skin & Allergy",
+    subtitle: "(External / immune reactions)",
+    symptoms: [
+      { key: "rash", label: "Rash" },
+      { key: "itching_skin", label: "Itching skin" },
+      { key: "skin_swelling", label: "Skin swelling" },
+      { key: "skin_abnormality", label: "Skin abnormality" },
+      { key: "lip_swelling", label: "Lip swelling" },
+      { key: "red_eyes", label: "Red eyes" },
+    ],
+  },
+  {
+    title: "Group 5: Liver & Urinary Indicators",
+    subtitle: "(Internal organ signals)",
+    symptoms: [
+      { key: "yellow_skin", label: "Yellow skin" },
+      { key: "yellow_eyes", label: "Yellow eyes" },
+      { key: "dark_urine", label: "Dark urine" },
+      { key: "chest_pain", label: "Chest pain" },
+    ],
+  },
 ];
 
 const PROVINCES = [
@@ -58,6 +106,11 @@ const SymptomStart = () => {
   const [provinceDropdownOpen, setProvinceDropdownOpen] = useState(false);
 
   const progressPercent = (step / TOTAL_STEPS) * 100;
+  const currentGroupIndex = step - 3;
+  const currentGroup =
+    currentGroupIndex >= 0 && currentGroupIndex < SYMPTOM_GROUPS.length
+      ? SYMPTOM_GROUPS[currentGroupIndex]
+      : null;
 
   const toggleSymptom = (key: string) => {
     setSelectedSymptoms((prev) => {
@@ -69,7 +122,7 @@ const SymptomStart = () => {
   };
 
   const handleNext = () => {
-    if (step === 3) {
+    if (step === 7) {
       navigate("/symptoms/result", {
         state: {
           gender,
@@ -95,17 +148,18 @@ const SymptomStart = () => {
   return (
     <DashboardLayout>
       <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-2xl mx-auto">
-        <Link
-          to="/symptoms"
-          className="inline-flex items-center text-sm text-[#34AADC] hover:underline mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Link>
-
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-center">
-          Check Symptom
-        </h1>
+        <div className="relative mb-8 flex min-h-[2.75rem] items-center justify-center">
+          <Link
+            to="/symptoms"
+            className="absolute left-0 top-1/2 inline-flex -translate-y-1/2 items-center text-sm text-[#34AADC] hover:underline"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 shrink-0" />
+            Back
+          </Link>
+          <h1 className="text-center text-2xl font-bold text-gray-800 md:text-3xl">
+            Check Symptom
+          </h1>
+        </div>
 
         {/* Step 1: Gender + Province */}
         {step === 1 && (
@@ -254,14 +308,20 @@ const SymptomStart = () => {
           </div>
         )}
 
-        {/* Step 3: Symptom checkboxes */}
-        {step === 3 && (
+        {/* Step 3-7: Category-based symptom checkboxes */}
+        {step >= 3 && step <= 7 && currentGroup && (
           <div className="mt-8 space-y-6">
-            <p className="text-gray-800 font-medium text-center">
-              Select all symptoms your child is experiencing.
-            </p>
+            <div className="text-center">
+              <p className="text-gray-800 font-medium">
+                {currentGroup.title}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">{currentGroup.subtitle}</p>
+              <p className="text-sm text-gray-500 mt-3">
+                Select symptoms for this category.
+              </p>
+            </div>
             <div className="space-y-3">
-              {SYMPTOM_OPTIONS.map(({ key, label }) => (
+              {currentGroup.symptoms.map(({ key, label }) => (
                 <label
                   key={key}
                   className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-colors ${
@@ -332,10 +392,10 @@ const SymptomStart = () => {
           <button
             type="button"
             onClick={handleNext}
-            disabled={step === 3 && selectedSymptoms.size === 0}
+            disabled={step === 7 && selectedSymptoms.size === 0}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-[#34AADC] text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#2690c2] transition-colors"
-            aria-label={step === 3 ? "See results" : "Next step"}
-            title={step === 3 ? "See results" : undefined}
+            aria-label={step === 7 ? "See results" : "Next step"}
+            title={step === 7 ? "See results" : undefined}
           >
             <ChevronRight className="w-5 h-5" />
           </button>

@@ -21,8 +21,7 @@ const CheckSymptoms = () => {
         </p>
 
         <p className="mt-6 text-gray-600">
-          Answer a few simple questions to understand what may be affecting your child.
-          Quick, easy, and takes about 3 minutes.
+          Select the symptoms your child is facing to identify the possible diseases. It is quick and easy, takes only a few minutes.
         </p>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-start">
@@ -53,7 +52,9 @@ const CheckSymptoms = () => {
           <h2 className="font-bold text-gray-800">Important Notice</h2>
           <p className="mt-1 text-sm text-gray-700">
             This tool does not provide a medical diagnosis and should not replace
-            professional medical advice.
+            professional medical advice. It is limited to 7 diseases only (Allergy, Common Cold, Hepatitis_b, Malaria, Pneumonia,
+            Tuberculosis, and Typhoid), so some other possible diseases might not be available here.
+
           </p>
         </div>
 
