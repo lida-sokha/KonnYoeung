@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const generateOTP = require("../utils/generateOTP");
 const sendEmail = require("../utils/sendEmail");
 const { sourceMapsEnabled } = require("process");
+const RecentActivity = require("../models/RecentActivity");
 
 // 1. SIGNUP: User created and logged in immediately
 exports.signup = async (req, res) => {
@@ -292,4 +293,34 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
+};
+
+// In your user controller (where users/history is defined)
+exports.getUserHistory = async (req, res) => {
+    try {
+        let userId = null;
+        const authHeader = req.headers.authorization;
+
+        // Manual token check because we aren't using 'protect'
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            userId = decoded.id || decoded._id;
+        }
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: "User not identified" });
+        }
+
+        const activities = await RecentActivity.find({ user: userId })
+            .sort({ createdAt: -1 }) 
+            .limit(10);
+
+        res.status(200).json({
+            success: true,
+            data: activities
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
