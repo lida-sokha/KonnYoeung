@@ -24,9 +24,17 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true); // allow non-browser tools (curl, Postman)
+
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+
+    // allow any localhost/127.0.0.1 on any port in development
+    const localhostRegex = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+    if (localhostRegex.test(origin)) {
+      return callback(null, true);
+    }
+
     return callback(new Error("CORS policy: origin not allowed"), false);
   },
   credentials: true,

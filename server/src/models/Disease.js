@@ -7,25 +7,27 @@ const diseaseSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    slug: {
+    type: {
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
-      unique: true,
     },
     category: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     description: {
       type: String,
       required: true,
     },
-    severity: {
+    severityLevel: {
       type: String,
       default: 'Moderate',
+      trim: true,
+    },
+    severity: {
+      type: String,
       trim: true,
     },
     summary: {
@@ -51,4 +53,5 @@ const diseaseSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Disease', diseaseSchema);
+// Use the existing MongoDB collection name exactly (capital D) so we read the 'Disease' table with all 34 records.
+module.exports = mongoose.model('Disease', diseaseSchema, 'Disease');

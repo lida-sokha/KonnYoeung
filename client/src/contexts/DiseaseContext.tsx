@@ -3,102 +3,21 @@ import API from "../services/api";
 
 export interface Disease {
   id?: string;
-  slug?: string;
   name: string;
   category: string;
+  type?: string;
   createdAt?: string;
   updatedAt?: string;
   description: string;
   severity: string;
+  severityLevel?: string;
   summary: string;
   commonSymptoms: string[];
+  symptoms?: string[];
   seekCareWhen: string[];
+  whenToSeek?: string[];
   whatToDo: string[];
 }
-
-export const initialDiseases: Disease[] = [
-  {
-    id: "allergy",
-    name: "Allergy",
-    category: "Infectious Disease",
-    createdAt: "Nov 1, 2025",
-    updatedAt: "Dec 1, 2025",
-    description:
-      "Allergies occur when the body reacts to substances such as dust, pollen, food, or animal fur. In children, allergies often affect the skin, nose, eyes, or breathing and are usually not serious, but they can be uncomfortable.",
-    severity: "Moderate",
-    summary:
-      "Most mild allergies can be managed at home, but symptoms should be monitored.",
-    commonSymptoms: [
-      "Sneezing or runny nose",
-      "Itchy or watery eyes",
-      "Skin rash or itching",
-      "Mild cough or throat irritation",
-    ],
-    seekCareWhen: [
-      "Symptoms become severe or persistent",
-      "Breathing difficulty occurs",
-      "Swelling of the face, lips, or tongue appears",
-    ],
-    whatToDo: [
-      "Try to identify and avoid possible triggers (dust, pollen, certain foods)",
-      "Keep your child's environment clean and well-ventilated",
-      "Ensure your child gets enough rest and fluids",
-      "Monitor symptoms over time",
-    ],
-  },
-  {
-    id: "malaria",
-    name: "Malaria",
-    category: "Infectious Disease",
-    createdAt: "Oct 20, 2025",
-    updatedAt: "Nov 28, 2025",
-    description: "Malaria is a mosquito-borne infectious disease.",
-    severity: "High",
-    summary: "Requires prompt medical treatment.",
-    commonSymptoms: ["Fever", "Chills", "Sweating", "Headache"],
-    seekCareWhen: ["High fever", "Severe chills", "Confusion"],
-    whatToDo: ["Seek medical care", "Prevent mosquito bites"],
-  },
-  {
-    id: "hypertension",
-    name: "Hypertension",
-    category: "Cardiovascular",
-    createdAt: "Jan 2, 2025",
-    updatedAt: "Nov 25, 2025",
-    description: "High blood pressure condition.",
-    severity: "Moderate",
-    summary: "Manage with lifestyle and medication.",
-    commonSymptoms: ["Often no symptoms", "Headaches", "Dizziness"],
-    seekCareWhen: ["Severe headache", "Chest pain", "Shortness of breath"],
-    whatToDo: ["Monitor blood pressure", "Reduce salt intake", "Exercise regularly"],
-  },
-  {
-    id: "type-2-diabetes",
-    name: "Type 2 Diabetes",
-    category: "Metabolic",
-    createdAt: "Oct 25, 2025",
-    updatedAt: "Nov 20, 2025",
-    description: "Chronic condition affecting blood sugar regulation.",
-    severity: "Moderate",
-    summary: "Lifestyle and medication can help manage it.",
-    commonSymptoms: ["Increased thirst", "Frequent urination", "Fatigue"],
-    seekCareWhen: ["Very high or low blood sugar", "Confusion", "Fainting"],
-    whatToDo: ["Follow diet plan", "Take medication as prescribed", "Monitor blood sugar"],
-  },
-  {
-    id: "tuberculosis",
-    name: "Tuberculosis",
-    category: "Infectious Disease",
-    createdAt: "Oct 20, 2025",
-    updatedAt: "Nov 15, 2025",
-    description: "Bacterial infection mainly affecting the lungs.",
-    severity: "High",
-    summary: "Requires long-term treatment.",
-    commonSymptoms: ["Cough", "Fever", "Weight loss", "Night sweats"],
-    seekCareWhen: ["Coughing blood", "Severe chest pain", "Difficulty breathing"],
-    whatToDo: ["Complete full course of treatment", "Avoid spreading to others"],
-  },
-];
 
 type DiseaseContextValue = {
   diseases: Disease[];
@@ -114,7 +33,7 @@ const formatDate = () => {
 };
 
 export function DiseaseProvider({ children }: { children: ReactNode }) {
-  const [diseases, setDiseases] = useState<Disease[]>(initialDiseases);
+  const [diseases, setDiseases] = useState<Disease[]>([]);
 
   useEffect(() => {
     API.get<Disease[]>('/diseases')
@@ -123,7 +42,13 @@ export function DiseaseProvider({ children }: { children: ReactNode }) {
           setDiseases(
             res.data.map((d) => ({
               ...d,
-              id: d.slug ?? d.id,
+              id: String((d as any)._id ?? d.id ?? d.name ?? ''),
+              category: d.category ?? d.type ?? '',
+              severity: d.severity ?? d.severityLevel ?? 'Moderate',
+              commonSymptoms: d.commonSymptoms ?? d.symptoms ?? [],
+              seekCareWhen: d.seekCareWhen ?? d.whenToSeek ?? [],
+              summary: d.summary ?? '',
+              whatToDo: d.whatToDo ?? [],
               createdAt: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'}) : '',
               updatedAt: d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'}) : '',
             }))
@@ -131,13 +56,20 @@ export function DiseaseProvider({ children }: { children: ReactNode }) {
         }
       })
       .catch((err) => {
-        console.warn('Could not load diseases from API, using local default.', err?.message || err);
-        setDiseases(initialDiseases);
+        console.warn('Could not load diseases from API; no fixed fallback is used.', err?.message || err);
+        setDiseases([]);
       });
   }, []);
 
   const getDiseaseById = useCallback(
-    (id: string) => diseases.find((d) => d.id === id || d.slug === id || d.slug === id.replace(/_/g, '-')) ?? null,
+    (id: string) =>
+      diseases.find(
+        (d) =>
+          d.id === id ||
+          d.name?.toLowerCase() === id.toLowerCase() ||
+          d.name?.toLowerCase().replace(/\s+/g, '_') === id.toLowerCase() ||
+          d.name?.toLowerCase().replace(/\s+/g, '-') === id.toLowerCase()
+      ) ?? null,
     [diseases]
   );
 
