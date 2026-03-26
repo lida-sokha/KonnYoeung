@@ -9,6 +9,7 @@ const hospitalRoutes = require("./src/routes/hospital.route.js");
 const articleRoutes = require("./src/routes/article.route.js");
 const adminRoutes = require("./src/routes/admin.route.js");
 const symptomRoutes = require("./src/routes/symptom.route.js");
+const diseaseRoutes = require("./src/routes/disease.route.js");
 
 const app = express();
 app.use(cookieParser());
@@ -35,6 +36,7 @@ app.use(express.json());
 
 // Symptom ML predict: no MongoDB required (Python + pickles).
 app.use("/api/symptoms", symptomRoutes);
+app.use("/api/diseases", diseaseRoutes);
 
 app.get("/", (req, res) => {
   res.send("KonnYoeung Backend is Running!");

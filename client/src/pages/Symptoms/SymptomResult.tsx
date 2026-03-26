@@ -30,14 +30,16 @@ function formatMlDiseaseLabel(raw: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function findDiseaseForMlLabel(label: string): Disease | null {
+function findDiseaseForMlLabel(label: string, diseases: Disease[]): Disease | null {
   const lower = label.toLowerCase();
   const asHyphen = lower.replace(/_/g, "-");
   return (
-    initialDiseases.find(
+    diseases.find(
       (d) =>
-        d.id === lower ||
-        d.id === asHyphen ||
+        d.id?.toLowerCase() === lower ||
+        d.slug?.toLowerCase() === lower ||
+        d.id?.toLowerCase() === asHyphen ||
+        d.slug?.toLowerCase() === asHyphen ||
         d.name.toLowerCase().replace(/\s+/g, " ") === lower.replace(/_/g, " ")
     ) ?? null
   );
@@ -68,8 +70,8 @@ const FALLBACK_DISEASE: Disease = {
   ],
 };
 
-function resolveDiseaseFromMlLabel(mlLabel: string): Disease {
-  const found = findDiseaseForMlLabel(mlLabel);
+function resolveDiseaseFromMlLabel(mlLabel: string, diseases: Disease[]): Disease {
+  const found = findDiseaseForMlLabel(mlLabel, diseases);
   if (found) return found;
   return {
     ...FALLBACK_DISEASE,
@@ -180,6 +182,7 @@ function DiseaseFullDetail({ disease }: { disease: Disease }) {
 }
 
 const SymptomResult = () => {
+  const [diseases, setDiseases] = useState<Disease[]>(initialDiseases);
   const location = useLocation();
   const state = location.state as {
     selectedSymptoms?: string[];
@@ -193,6 +196,25 @@ const SymptomResult = () => {
   const [mlData, setMlData] = useState<MlResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [openLearnMore, setOpenLearnMore] = useState<Set<number>>(() => new Set([0]));
+
+  useEffect(() => {
+    API.get<Disease[]>('/diseases')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setDiseases(
+            res.data.map((d) => ({
+              ...d,
+              id: d.slug ?? d.id ?? '',
+              createdAt: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+              updatedAt: d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            }))
+          );
+        }
+      })
+      .catch(() => {
+        setDiseases(initialDiseases);
+      });
+  }, []);
 
   const toggleLearnMore = (index: number) => {
     setOpenLearnMore((prev) => {
@@ -278,7 +300,7 @@ const SymptomResult = () => {
             {!loading && !errorMessage && mlData && mlData.predictions.length > 0 && (
               <ul className="space-y-3 text-gray-700">
                 {mlData.predictions.map((item, index) => {
-                  const resolved = resolveDiseaseFromMlLabel(item.disease);
+                  const resolved = resolveDiseaseFromMlLabel(item.disease, diseases);
                   const isOpen = openLearnMore.has(index);
                   return (
                     <li

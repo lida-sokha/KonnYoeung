@@ -1,11 +1,13 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import API from "../services/api";
 
 export interface Disease {
-  id: string;
+  id?: string;
+  slug?: string;
   name: string;
   category: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   description: string;
   severity: string;
   summary: string;
@@ -114,8 +116,28 @@ const formatDate = () => {
 export function DiseaseProvider({ children }: { children: ReactNode }) {
   const [diseases, setDiseases] = useState<Disease[]>(initialDiseases);
 
+  useEffect(() => {
+    API.get<Disease[]>('/diseases')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setDiseases(
+            res.data.map((d) => ({
+              ...d,
+              id: d.slug ?? d.id,
+              createdAt: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'}) : '',
+              updatedAt: d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric'}) : '',
+            }))
+          );
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load diseases from API, using local default.', err?.message || err);
+        setDiseases(initialDiseases);
+      });
+  }, []);
+
   const getDiseaseById = useCallback(
-    (id: string) => diseases.find((d) => d.id === id) ?? null,
+    (id: string) => diseases.find((d) => d.id === id || d.slug === id || d.slug === id.replace(/_/g, '-')) ?? null,
     [diseases]
   );
 
