@@ -295,13 +295,11 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// In your user controller (where users/history is defined)
 exports.getUserHistory = async (req, res) => {
     try {
         let userId = null;
         const authHeader = req.headers.authorization;
 
-        // Manual token check because we aren't using 'protect'
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET);

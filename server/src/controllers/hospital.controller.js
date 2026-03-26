@@ -29,13 +29,11 @@ exports.getHospitalById = async (req, res) => {
         const hospital = await Hospital.findById(req.params.id);
         if (!hospital) return res.status(404).json({ message: "Hospital not found" });
 
-        // --- MANUALLY "MARK AS VIEWED" ---
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.split(' ')[1];
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                // Ensure we catch the correct ID key from the token
                 const userId = decoded.id || decoded._id;
 
                 if (userId) {
