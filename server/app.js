@@ -12,10 +12,25 @@ const symptomRoutes = require("./src/routes/symptom.route.js");
 
 const app = express();
 app.use(cookieParser());
+
+const allowedOrigins = [
+  process.env.CLIENT_URL || "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500"
+];
+
 app.use(cors({
-  origin: "http://localhost:5173", 
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser tools (curl, Postman)
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("CORS policy: origin not allowed"), false);
+  },
+  credentials: true,
 }));
+
 app.use(express.json());
 
 // Symptom ML predict: no MongoDB required (Python + pickles).

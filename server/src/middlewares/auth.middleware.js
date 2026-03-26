@@ -2,11 +2,16 @@ const jwt = require("jsonwebtoken");
 const { deflate } = require("zlib");
 
 const protect = async (req, res, next) => {
-    const token = req.cookies.token;
+    const fromCookie = req.cookies?.token;
+    const authHeader = req.headers?.authorization;
+    const fromHeader = authHeader && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : undefined;
+    const token = fromCookie || fromHeader;
+
     if (!token) return res.status(401).json({ message: "No token" });
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const secret = process.env.JWT_SECRET || "temp_secret";
+        const decoded = jwt.verify(token, secret);
         req.user = decoded;
         next();
     } catch (err) {
