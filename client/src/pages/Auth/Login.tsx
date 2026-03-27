@@ -93,27 +93,31 @@ export default function Login() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className={inputStyle}
-                required
-                disabled={loading}
-              />
+              {/* Added 'relative' here so the icon stays inside the input */}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`${inputStyle} pr-12`} // Added padding-right so text doesn't go under icon
+                  required
+                  disabled={loading}
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-sky-500"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-sky-500 transition-colors z-10"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
+              </div>
             </div>
 
             <div className="flex justify-end">
-              <a href="#" className="text-sm text-sky-500 font-semibold hover:underline">
+              <a href="/forgot-password" className="text-sm text-sky-500 font-semibold hover:underline">
                 Reset your password
               </a>
             </div>

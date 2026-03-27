@@ -5,7 +5,7 @@ const generateOTP = require("../utils/generateOTP");
 const sendEmail = require("../utils/sendEmail");
 const { sourceMapsEnabled } = require("process");
 const RecentActivity = require("../models/RecentActivity");
-
+const crypto = require('crypto');
 // 1. SIGNUP: User created and logged in immediately
 exports.signup = async (req, res) => {
   try {
@@ -222,6 +222,84 @@ exports.resendOtp = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; 
+
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    // 1. Fixed the variable name here to match what you pass below
+    const htmlMessage = `
+      <h1>You have requested a password reset</h1>
+      <p>Please go to this link to reset your password. This link expires in 15 minutes.</p>
+      <a href="${resetUrl}" clicktracking="off">Reset the Passwords</a>
+    `;
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: "Password Reset Request",
+            html: htmlMessage, // 2. Matches the variable above now
+        });
+        
+        res.status(200).json({ success: true, message: "Email sent" });
+    } catch (err) {
+      // Clear the tokens if email fails so they don't sit in the DB
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      
+      console.error("Mail Error:", err.message); // Helpful for debugging backend logs
+      return res.status(500).json({ success: false, message: "Email could not be sent" });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc    Reset actual password in DB
+exports.resetPassword = async (req, res) => {
+  try {
+    // Hash the token from the URL to compare with DB
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(req.params.resetToken)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid or expired token" });
+    }
+
+    // Set new password
+    user.password = await bcrypt.hash(req.body.password, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password reset success" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 

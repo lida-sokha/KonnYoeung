@@ -1,12 +1,13 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async (email, subject, text) => {
+// Use an object as the argument to make it flexible for both OTP and Reset Links
+const sendEmail = async ({ email, subject, text, html }) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail", // Lowercase "gmail" is standard
+      service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // MUST be the 16-character App Password
+        pass: process.env.EMAIL_PASS, 
       },
     });
 
@@ -14,7 +15,8 @@ const sendEmail = async (email, subject, text) => {
       from: `"KonnYoeung App" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: subject,
-      text: text,
+      text: text, 
+      html: html, 
     };
 
     await transporter.sendMail(mailOptions);
