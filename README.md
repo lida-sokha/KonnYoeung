@@ -22,7 +22,6 @@ Your trusted digital partner for children's health in Cambodia. Check your child
 - **Vite** - Fast build tool and development server
 - **Tailwind CSS** - Utility-first CSS framework
 - **React Router** - Client-side routing
-- **Leaflet** - Interactive maps for hospital locations
 - **Axios** - HTTP client for API calls
 - **React Hot Toast** - Toast notifications
 
