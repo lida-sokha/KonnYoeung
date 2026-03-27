@@ -147,34 +147,65 @@ exports.googleLogin = async (req, res) => {
   try {
     const { email, fullName, googleId } = req.body;
 
+    // 1. Find the user by email
     let user = await User.findOne({ email });
 
-    if (!user) {
+    if (user) {
+      // SECURITY CHECK: 
+      // If the user exists but doesn't have a googleId, they originally signed up with a password.
+      // We link the account by adding the googleId now.
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.isVerified = true; // Google users are pre-verified
+        await user.save();
+      } 
+      // If they HAVE a googleId, ensure it matches the one sent from the frontend
+      else if (user.googleId !== googleId) {
+        return res.status(401).json({ 
+          success: false, 
+          message: "Google ID mismatch. Please contact support." 
+        });
+      }
+    } else {
+      // 2. Create a new user if they don't exist
       user = await User.create({
         fullName,
         email,
         googleId,
-        isVerified: true, // Auto-verify Google users
-        password: Math.random().toString(36).slice(-10), // Random password placeholder
+        isVerified: true,
+        // Using a random string for password is fine, 
+        // but ensure your Schema doesn't require a specific password format
+        password: Math.random().toString(36).slice(-10) + Date.now(),
       });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    // 3. Generate JWT
+    const token = jwt.sign(
+      { id: user._id }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1d" }
+    );
 
+    // 4. Set Cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax", // "None" is required for cross-domain cookies in production
       maxAge: 24 * 60 * 60 * 1000
     });
 
     res.status(200).json({
       success: true,
-      message: "Google Login successful",
-      user: { id: user._id, fullName: user.fullName, email: user.email }
+      message: "Login successful",
+      user: { 
+        id: user._id, 
+        fullName: user.fullName, 
+        email: user.email 
+      }
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Google Login Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 

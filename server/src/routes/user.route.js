@@ -176,7 +176,7 @@ router.post("/verify-otp", verifyOtp);
  *       500:
  *         description: Server error
  */
-router.post("/google", googleLogin);
+router.post("/google-login", googleLogin);
 
 /**
  * @swagger

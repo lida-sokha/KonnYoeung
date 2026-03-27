@@ -221,7 +221,7 @@ function App() {
         gutter={12}
         toastOptions={toastOptions}
       />
-      <GoogleOAuthProvider clientId="">
+      <GoogleOAuthProvider clientId="326620742040-1kt41ug0m6dsmb17rfjp78svn2of9ds6.apps.googleusercontent.com">
         <AppContent />
       </GoogleOAuthProvider>
     </Router>
