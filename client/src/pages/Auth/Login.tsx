@@ -2,6 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import loginImage from "../../../public/images/login-removebg-preview.png";
 import API from "../../services/api";
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from "jwt-decode";
+import toast from 'react-hot-toast';
 import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
@@ -52,7 +55,23 @@ export default function Login() {
     }
   };
   const inputStyle = `w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 transition-all`;
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      const decoded: any = jwtDecode(credentialResponse.credential);
+      const res = await API.post("/users/google-login", {
+        email: decoded.email,
+        fullName: decoded.name,
+        googleId: decoded.sub
+      });
 
+      if (res.data.success) {
+        toast.success("Welcome back!");
+        navigate("/dashboard");
+      }
+    } catch (err: any) {
+      toast.error("Google Login failed. Please try again.");
+    }
+  };
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-gray-50">
 
@@ -93,27 +112,31 @@ export default function Login() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className={inputStyle}
-                required
-                disabled={loading}
-              />
+              {/* Added 'relative' here so the icon stays inside the input */}
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className={`${inputStyle} pr-12`} // Added padding-right so text doesn't go under icon
+                  required
+                  disabled={loading}
+                />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-sky-500"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-sky-500 transition-colors z-10"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
+              </div>
             </div>
 
             <div className="flex justify-end">
-              <a href="#" className="text-sm text-sky-500 font-semibold hover:underline">
+              <a href="/forgot-password" className="text-sm text-sky-500 font-semibold hover:underline">
                 Reset your password
               </a>
             </div>
@@ -133,10 +156,15 @@ export default function Login() {
           </div>
 
           {/* Social Login */}
-          <button className="w-full flex items-center justify-center gap-3 rounded-xl border border-gray-200 py-3 hover:bg-gray-50 font-medium transition-colors">
-            <img src="/images/google_logo.png" className="h-5" alt="Google" />
-            Continue with Google
-          </button>
+          <div className="w-full flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error("Google Login Failed")}
+              theme="outline"
+              shape="pill"
+              width="380px"
+            />
+          </div>
 
           <p className="mt-10 text-sm text-center text-gray-600">
             Don’t have account?{" "}

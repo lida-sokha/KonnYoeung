@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true // Allows multiple users to NOT have a googleId
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
     otp: String,
     otpExpires: Date,
     isVerified: {

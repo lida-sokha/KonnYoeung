@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp, saveHospital, SaveArticle } = require("../controllers/auth.controller");
+const { signup, login, verifyOtp, googleLogin, checkAuth, resendOtp, saveHospital, SaveArticle,getUserHistory,forgotPassword, resetPassword } = require("../controllers/auth.controller");
 const { protect } = require("../middlewares/auth.middleware");
 /**
  * @swagger
@@ -176,7 +176,7 @@ router.post("/verify-otp", verifyOtp);
  *       500:
  *         description: Server error
  */
-router.post("/google", googleLogin);
+router.post("/google-login", googleLogin);
 
 /**
  * @swagger
@@ -247,4 +247,9 @@ router.post('/save', protect, saveHospital);
 
 router.post('/saveArticle', protect, SaveArticle);
 
+router.get("/history", protect, getUserHistory);
+
+router.post('/forgot-password', forgotPassword);
+
+router.put('/reset-password/:resetToken', resetPassword);
 module.exports = router;

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import API from '../../services/api'; 
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../components/Layout/Sections/DashboardLayout';
+import { useLocation } from 'react-router-dom';
 import { 
   Clock, Lightbulb, Bookmark, BookOpen, 
   Hospital, ChevronRight, Heart, Activity 
@@ -16,19 +17,38 @@ interface ArticlDatea {
   article_ID: string;
   article_title : String;
 }
+interface ActivityData {
+  _id: string;
+  actionType: 'READ_ARTICLE' | 'VIEWED_HOSPITAL';
+  metadata: {
+    title: string;
+    entityId: string;
+    link: string;
+  };
+  createdAt: string;
+}
 const DashboardPage = () => {
   const [savedHospitals, setSavedHospitals] = useState<HospitalData[]>([]);
   const [savedArticles, setSavedArticles] = useState<ArticlDatea[]>([]);
+  const [activities, setActivities] = useState<ActivityData[]>([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        setLoading(true);
         const response = await API.get("users/check-auth");
         if (response.data.success) {
           setSavedHospitals(response.data.user.savedHospitals || []);
           setSavedArticles(response.data.user.savedArticles || []);
         }
+        const historyRes = await API.get("users/history");
+        console.log("HISTORY RESPONSE:", historyRes.data);
+        if (historyRes.data.success) {
+          setActivities(historyRes.data.data);
+        }
+
       } catch (err) {
         console.error("Error fetching saved hospitals ", err);
       } finally {
@@ -36,7 +56,22 @@ const DashboardPage = () => {
       }
     };
     fetchUserData();
-  }, []);
+  }, [location.pathname]);
+
+const formatTimeAgo = (dateInput: string | Date) => {
+      const now = new Date();
+      const past = new Date(dateInput);
+      const seconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+      if (seconds < 60) return "Just now";
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return days === 1 ? "1 day ago" : `${days} days ago`;
+};
+
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
@@ -50,15 +85,36 @@ const DashboardPage = () => {
           <div className="lg:col-span-2 space-y-6">
             
             <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm bg-white">
-              <div className="bg-green-400 p-4 text-white flex items-center gap-2">
-                <Clock size={20} />
-                <span className="font-semibold">Recent Activity</span>
-              </div>
-              <div className="p-4 space-y-6">
-                <ActivityItem icon={<BookOpen className="text-blue-500"/>} title="Read Article" desc="Understanding Dengue Fever Prevention" time="2 hours ago" />
-                <ActivityItem icon={<Hospital className="text-blue-400"/>} title="Viewed Hospital" desc="Calmette Hospital - Phnom Penh" time="1 day ago" />
-              </div>
+          {/* Header stays fixed at the top */}
+            <div className="bg-green-400 p-4 text-white flex items-center gap-2">
+              <Clock size={20} />
+              <span className="font-semibold">Recent Activity</span>
             </div>
+
+            <div className="p-4 space-y-6 max-h-[400px] overflow-y-auto custom-scrollbar">
+              {loading ? (
+                <p className="text-sm text-gray-400 animate-pulse">Loading activity...</p>
+              ) : activities.length > 0 ? (
+                activities.map((act) => {
+                  const icon = act.actionType === 'READ_ARTICLE' ? 
+                    <BookOpen className="text-blue-500"/> : 
+                    <Hospital className="text-blue-400"/>;
+
+                  return (
+                    <ActivityItem 
+                      key={act._id}
+                      icon={icon} 
+                      title={act.actionType.replace('_', ' ')}
+                      desc={act.metadata.title} 
+                      time={formatTimeAgo(act.createdAt)} 
+                    />
+                  );
+                })
+              ) : (
+                <p className="text-sm text-gray-400 text-center py-4">No recent activity found.</p>
+              )}
+            </div>
+          </div>
 
             <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm bg-white">
               <div className="bg-[#A855F7] p-4 text-white flex items-center justify-between">
