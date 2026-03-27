@@ -1,7 +1,5 @@
 const Hospital = require("../models/Hospital");
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const RecentActivity = require('../models/RecentActivity');
+
 exports.getAllHospital = async (req, res) => {
     try {
         const hospitals = await Hospital.find();
@@ -26,36 +24,16 @@ exports.addHospital = async (req, res) => {
 
 exports.getHospitalById = async (req, res) => {
     try {
+        // req.params.id comes from the URL /api/hospitals/:id
         const hospital = await Hospital.findById(req.params.id);
-        if (!hospital) return res.status(404).json({ message: "Hospital not found" });
 
-        const authHeader = req.headers.authorization;
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            const token = authHeader.split(' ')[1];
-            try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                const userId = decoded.id || decoded._id;
-
-                if (userId) {
-                    await RecentActivity.create({
-                        user: userId,
-                        actionType: 'VIEWED_HOSPITAL',
-                        metadata: {
-                            title: hospital.name,
-                            entityId: hospital._id,
-                            link: `/hospitals/${hospital._id}`
-                        }
-                    });
-                    console.log(`Hospital activity saved for user: ${userId}`);
-                }
-            } catch (err) {
-                console.log("Hospital view recorded as guest (token error)");
-            }
+        if (!hospital) {
+            return res.status(404).json({ message: "Hospital not found in database" });
         }
 
         res.status(200).json(hospital);
     } catch (error) {
-        console.error("Hospital Controller Error:", error.message);
+        console.error("Error fetching hospital by ID:", error.message);
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
