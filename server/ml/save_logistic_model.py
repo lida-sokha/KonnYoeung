@@ -17,33 +17,6 @@ MODEL_FILE = os.path.join(SAVE_DIR, "disease_model.pkl")
 LABEL_ENCODER_FILE = os.path.join(SAVE_DIR, "label_encoder.pkl")
 SYMPTOM_COLUMNS_FILE = os.path.join(SAVE_DIR, "symptom_columns.pkl")
 
-# Map website/app symptom keys and common variants to model feature names.
-# Keep keys normalized (lowercase, underscore-separated).
-SYMPTOM_ALIASES = {
-    # canonicalized alias keys (lowercase + underscores)
-    "red_eye": "red_eyes",
-    "yellow_eye": "yellow_eyes",
-    "yellow_skin": "yellow_skin",
-    "joint_pain": "joint_pain",
-    "shortness_of_breath": "shortness_of_breath",
-    "nasal_congestion": "nasal_congestion",
-    "mucus_in_throat": "mucus_in_throat",
-    "feel_cold": "feel_cold",
-    "itching_skin": "itching_skin",
-    "skin_swelling": "skin_swelling",
-    "skin_abnormality": "skin_abnormality",
-    "lip_swelling": "lip_swelling",
-    "dark_urine": "dark_urine",
-    "sore_throat": "sore_throat",
-    "chest_pain": "chest_pain",
-    "runny_nose": "nasal_congestion",
-    "stuffy_nose": "nasal_congestion",
-    "difficulty_breathing": "shortness_of_breath",
-    "itchy_skin": "itching_skin",
-    "itchy_eyes": "red_eyes",
-}
-
-
 def train_and_save_logistic_model(
     data_path=os.path.join(THIS_DIR, "final_dataset.csv"),
     save_dir=SAVE_DIR,
@@ -65,7 +38,6 @@ def train_and_save_logistic_model(
 
     X = df.drop(columns=["prognosis"])
 
-    # Feature order must be stable for prediction.
     symptom_columns = X.columns.tolist()
 
     le = LabelEncoder()
@@ -74,8 +46,7 @@ def train_and_save_logistic_model(
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=random_state, stratify=y
     )
-
-    # Match your notebook approach:
+    
     # 1) Under-sample classes > target_per_class to exactly target_per_class
     current_counts = pd.Series(y_train).value_counts()
     classes_to_under = {
@@ -124,8 +95,7 @@ def load_model_artifacts(
 
 
 def normalize_symptom_key(value: str) -> str:
-    normalized = value.strip().lower().replace("-", "_").replace(" ", "_")
-    return SYMPTOM_ALIASES.get(normalized, normalized)
+    return value.strip().lower().replace("-", "_").replace(" ", "_")
 
 
 def build_input_vector(selected_symptoms, symptom_columns):
@@ -228,7 +198,6 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true", help="Enable Flask debug mode.")
     args = parser.parse_args()
 
-    # Default behavior: serve only. Training is explicit via --train.
     do_train = args.train
     do_serve = args.serve or (not args.train and not args.serve)
 
