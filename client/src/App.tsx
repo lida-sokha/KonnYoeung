@@ -19,9 +19,8 @@ import SymptomResult from './pages/Symptoms/SymptomResult';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { DiseaseProvider } from './contexts/DiseaseContext';
 import Settings from './pages/Settingpage/Setting';
-import toastOptions from './config/toastConfig';
-import ForgetPassword from './pages/Auth/Forgetpassword';
-import ConfirmNewPassword from './pages/Auth/Confirmpassword';
+import toastOptions from './config/toastConfig'
+
 //admin 
 import AdminRoute from './components/auth/AdminRoute'; 
 import AdminDashboard from './pages/Admin/AdminDashboard/AdminDashboard';
@@ -47,8 +46,6 @@ function AppContent() {
       </Route>
 
       <Route path="/login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgetPassword />} />
-      <Route path="/reset-password/:resetToken" element={<ConfirmNewPassword />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/verify" element={<Verify />} />
 
@@ -221,7 +218,7 @@ function App() {
         gutter={12}
         toastOptions={toastOptions}
       />
-      <GoogleOAuthProvider clientId="326620742040-1kt41ug0m6dsmb17rfjp78svn2of9ds6.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId="">
         <AppContent />
       </GoogleOAuthProvider>
     </Router>
