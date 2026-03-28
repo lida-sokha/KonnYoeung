@@ -49,6 +49,29 @@ router.get("/", getAllHospital);
  */
 router.post('/addNewHospital', addHospital);
 
+/**
+ * @swagger
+ * /api/hospitals/{id}:
+ *   get:
+ *     summary: Retrieve a hospital by ID
+ *     tags: [Hospitals]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The hospital ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Hospital details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Hospital'
+ *       404:
+ *         description: Hospital not found
+ */
 router.get("/:id", getHospitalById);
 
 module.exports = router;

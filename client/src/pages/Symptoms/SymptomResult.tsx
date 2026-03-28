@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
-import { initialDiseases, type Disease } from "../../contexts/DiseaseContext";
+import { type Disease } from "../../contexts/DiseaseContext";
 import API from "../../services/api";
 
 type MlPrediction = { disease: string; confidence: number };
@@ -30,53 +30,26 @@ function formatMlDiseaseLabel(raw: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function findDiseaseForMlLabel(label: string): Disease | null {
-  const lower = label.toLowerCase();
-  const asHyphen = lower.replace(/_/g, "-");
+function findDiseaseForMlLabel(label: string, diseases: Disease[]): Disease | null {
+  const normalize = (val?: string) =>
+    (val || "")
+      .toLowerCase()
+      .replace(/[_\s]+/g, " ")
+      .replace(/\s+-\s+/g, " ")
+      .trim();
+
+  const normalizedLabel = normalize(label);
+
   return (
-    initialDiseases.find(
-      (d) =>
-        d.id === lower ||
-        d.id === asHyphen ||
-        d.name.toLowerCase().replace(/\s+/g, " ") === lower.replace(/_/g, " ")
-    ) ?? null
+    diseases.find((d) => {
+      const nameNorm = normalize(d.name);
+      return nameNorm === normalizedLabel;
+    }) ?? null
   );
 }
 
-const FALLBACK_DISEASE: Disease = {
-  id: "general",
-  name: "General guidance",
-  category: "General",
-  createdAt: "",
-  updatedAt: "",
-  description:
-    "Based on the symptoms you selected, we recommend monitoring your child and seeking professional medical advice if symptoms persist or worsen. This tool does not provide a diagnosis.",
-  severity: "Moderate",
-  summary: "When in doubt, consult a healthcare provider for personalized advice.",
-  commonSymptoms: [],
-  seekCareWhen: [
-    "Symptoms worsen or last more than a few days",
-    "High fever, difficulty breathing, or severe pain",
-    "Your child is very sleepy or hard to wake",
-    "Signs of dehydration (fewer wet nappies, dry mouth)",
-  ],
-  whatToDo: [
-    "Keep your child comfortable and hydrated",
-    "Monitor symptoms and note any changes",
-    "Contact a doctor or clinic if you are concerned",
-    "In an emergency, go to the nearest hospital",
-  ],
-};
-
-function resolveDiseaseFromMlLabel(mlLabel: string): Disease {
-  const found = findDiseaseForMlLabel(mlLabel);
-  if (found) return found;
-  return {
-    ...FALLBACK_DISEASE,
-    id: mlLabel,
-    name: formatMlDiseaseLabel(mlLabel),
-    description: `${FALLBACK_DISEASE.description} The symptom model suggests reviewing information related to ${formatMlDiseaseLabel(mlLabel)} with a healthcare professional.`,
-  };
+function resolveDiseaseFromMlLabel(mlLabel: string, diseases: Disease[]): Disease | null {
+  return findDiseaseForMlLabel(mlLabel, diseases);
 }
 
 /** Full single-disease layout (same sections as the original results page, for one disease). */
@@ -180,6 +153,7 @@ function DiseaseFullDetail({ disease }: { disease: Disease }) {
 }
 
 const SymptomResult = () => {
+  const [diseases, setDiseases] = useState<Disease[]>([]);
   const location = useLocation();
   const state = location.state as {
     selectedSymptoms?: string[];
@@ -193,6 +167,31 @@ const SymptomResult = () => {
   const [mlData, setMlData] = useState<MlResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [openLearnMore, setOpenLearnMore] = useState<Set<number>>(() => new Set([0]));
+
+  useEffect(() => {
+    API.get<Disease[]>('/diseases')
+      .then((res) => {
+        if (res.data && res.data.length > 0) {
+          setDiseases(
+            res.data.map((d) => ({
+              ...d,
+              id: String((d as any)._id ?? d.id ?? d.name ?? ''),
+              category: d.category ?? (d.type as string) ?? 'General',
+              severity: d.severity ?? (d as any).severityLevel ?? 'Moderate',
+              summary: d.summary ?? '',
+              commonSymptoms: d.commonSymptoms ?? (d as any).symptoms ?? [],
+              seekCareWhen: d.seekCareWhen ?? (d as any).whenToSeek ?? [],
+              whatToDo: d.whatToDo ?? [],
+              createdAt: d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+              updatedAt: d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            }))
+          );
+        }
+      })
+      .catch(() => {
+        setDiseases([]);
+      });
+  }, []);
 
   const toggleLearnMore = (index: number) => {
     setOpenLearnMore((prev) => {
@@ -225,10 +224,13 @@ const SymptomResult = () => {
       .catch((err) => {
         if (cancelled) return;
         const data = err.response?.data as
-          | { error?: string; unmatched_symptoms?: string[] }
+          | { error?: string; detail?: string; unmatched_symptoms?: string[] }
           | undefined;
         const msg = data?.error || err.message || "Prediction request failed.";
         let full = typeof msg === "string" ? msg : "Prediction request failed.";
+        if (typeof data?.detail === "string" && data.detail.trim().length > 0) {
+          full += ` Detail: ${data.detail}`;
+        }
         if (data?.unmatched_symptoms?.length) {
           full += ` Unmatched: ${data.unmatched_symptoms.join(", ")}.`;
         }
@@ -278,7 +280,7 @@ const SymptomResult = () => {
             {!loading && !errorMessage && mlData && mlData.predictions.length > 0 && (
               <ul className="space-y-3 text-gray-700">
                 {mlData.predictions.map((item, index) => {
-                  const resolved = resolveDiseaseFromMlLabel(item.disease);
+                  const resolved = resolveDiseaseFromMlLabel(item.disease, diseases);
                   const isOpen = openLearnMore.has(index);
                   return (
                     <li
@@ -308,7 +310,15 @@ const SymptomResult = () => {
                       </div>
                       {isOpen && (
                         <div className="px-4 pb-4">
-                          <DiseaseFullDetail disease={resolved} />
+                          {resolved ? (
+                            <DiseaseFullDetail disease={resolved} />
+                          ) : (
+                            <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+                              <p className="text-sm text-red-700">
+                                The prediction returned “{formatMlDiseaseLabel(item.disease)}", but no matching disease record was found in the database. Please verify your disease dataset on the server.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </li>

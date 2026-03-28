@@ -7,7 +7,21 @@ const DiseaseDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { getDiseaseById } = useDiseases();
   const disease = id ? getDiseaseById(id) : null;
+  const severityImages: Record<string, string> = {
+    "High": "/images/high_severity.png",
+    "Moderate to High": "/images/high_severity.png", 
+    "Moderate": "/images/moderate_severity.png",
+    "Low to High": "/images/moderate_severity.png", 
+    "Low to Moderate": "/images/moderate_severity.png",
+    "Low": "/images/low_severity.png",
+  };
 
+  const currentSeverity = disease?.severityLevel || disease?.severity;
+
+  const mascotImage = currentSeverity 
+    ? (severityImages[currentSeverity] || "/images/mascot.png") 
+      : "/images/mascot.png";
+  
   if (!disease) {
     return (
       <DashboardLayout>
@@ -64,17 +78,19 @@ const DiseaseDetail = () => {
             </div>
 
             <div className="flex items-center justify-center md:justify-end">
-              <div className="h-32 w-32 rounded-full bg-[#E3F5FF] flex items-center justify-center">
+            <div className="flex items-center justify-center md:justify-end">
+              <div className="h-36 w-36 rounded-full bg-[#E3F5FF] flex items-center justify-center mb-10 shadow-sm">
                 <img
-                  src="/images/mascot.png"
-                  alt="Mascot"
-                  className="h-24 w-24 object-contain"
+                  src={mascotImage}
+                  alt={`${currentSeverity} mascot`}
+                  className="h-35 w-35 object-contain transition-all duration-300 mb-5"
                   onError={(e) => {
-                    e.currentTarget.style.display = "none";
+                    e.currentTarget.src = "/images/mascot.png";
                   }}
                 />
               </div>
             </div>
+          </div>
           </div>
 
           <div className="mb-6">

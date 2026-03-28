@@ -8,7 +8,13 @@ RUN apk add --update --no-cache \
     openblas-dev \
     gfortran
 
-RUN pip install --break-system-packages joblib scikit-learn numpy pandas
+RUN pip install --break-system-packages \
+    joblib \
+    scikit-learn \
+    numpy \
+    pandas \
+    flask \
+    imbalanced-learn
 
 WORKDIR /app
 COPY package*.json ./

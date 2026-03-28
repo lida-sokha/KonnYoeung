@@ -7,8 +7,7 @@ from flask import Flask, request, jsonify
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler
+
 
 
 THIS_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -56,6 +55,8 @@ def train_and_save_logistic_model(
     target_per_class=300,
     random_state=42,
 ):
+    from imblearn.over_sampling import SMOTE
+    from imblearn.under_sampling import RandomUnderSampler
     df = pd.read_csv(data_path)
     df["prognosis"] = df["prognosis"].str.replace(" ", "_")
 

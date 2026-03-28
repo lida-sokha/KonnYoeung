@@ -243,13 +243,147 @@ router.get("/check-auth", protect, checkAuth);
  */
 router.post("/resend-otp", resendOtp);
 
+/**
+ * @swagger
+ * /api/users/save:
+ *   post:
+ *     summary: Save a hospital to user's favorites
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - hospitalId
+ *             properties:
+ *               hospitalId:
+ *                 type: string
+ *                 example: "65f123abc456"
+ *     responses:
+ *       200:
+ *         description: Hospital saved successfully
+ *       401:
+ *         description: Unauthorized
+ */
 router.post('/save', protect, saveHospital);
 
+/**
+ * @swagger
+ * /api/users/saveArticle:
+ *   post:
+ *     summary: Save an article to user's favorites
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - articleId
+ *             properties:
+ *               articleId:
+ *                 type: string
+ *                 example: "article123"
+ *     responses:
+ *       200:
+ *         description: Article saved successfully
+ *       401:
+ *         description: Unauthorized
+ */
 router.post('/saveArticle', protect, SaveArticle);
 
+/**
+ * @swagger
+ * /api/users/history:
+ *   get:
+ *     summary: Get user's saved hospitals and articles history
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: User history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 hospitals:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                 articles:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       401:
+ *         description: Unauthorized
+ */
 router.get("/history", protect, getUserHistory);
 
+/**
+ * @swagger
+ * /api/users/forgot-password:
+ *   post:
+ *     summary: Send password reset link to email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "lida@gmail.com"
+ *     responses:
+ *       200:
+ *         description: Reset link sent to email
+ *       400:
+ *         description: User not found
+ */
 router.post('/forgot-password', forgotPassword);
 
+/**
+ * @swagger
+ * /api/users/reset-password/{resetToken}:
+ *   put:
+ *     summary: Reset user password using reset token
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: resetToken
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Password reset token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - password
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: "newpassword123"
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid or expired token
+ */
 router.put('/reset-password/:resetToken', resetPassword);
 module.exports = router;

@@ -162,7 +162,7 @@ export default function HomePage() {
                 iconName="activity" 
                 title="Check Symptoms Easily"
                 description="Answer simple questions about your child’s symptoms. Get a list of possible conditions, home care tips, and advice on whether to visit a clinic or hospital."
-                linkTo="/health"
+                linkTo="/symptoms"
                 iconBgColor='bg-green-100'
                 iconColor='text-green-500'
               />
@@ -170,7 +170,7 @@ export default function HomePage() {
               iconName="book"
                 title="Learn About Common Diseases"
                 description='Explore educational articles written to help parents understand common childhood illnesses, how to prevent them, and when to seek care.'
-                linkTo="/diseases"
+                linkTo="/symptoms"
                 iconBgColor='bg-red-100'
                 iconColor='text-red-500'
               />

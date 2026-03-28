@@ -9,7 +9,7 @@ const hospitalRoutes = require("./src/routes/hospital.route.js");
 const articleRoutes = require("./src/routes/article.route.js");
 const adminRoutes = require("./src/routes/admin.route.js");
 const symptomRoutes = require("./src/routes/symptom.route.js");
-
+const diseaseRoutes = require('./src/routes/disease.route');
 const app = express();
 app.use(cookieParser());
 
@@ -52,6 +52,7 @@ mongoose.connect(process.env.MONGODB_URI)
     app.use("/api/users", userRoutes);
     app.use('/api/hospitals', hospitalRoutes);
     app.use("/api/articles", articleRoutes);
+    app.use('/api/diseases', diseaseRoutes);
     app.use("/api/admin",adminRoutes);
 
     const PORT = process.env.PORT || 5000;
