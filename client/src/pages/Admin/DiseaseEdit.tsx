@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
-import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
 import { useDiseases } from "../../contexts/DiseaseContext";
 
 const SEVERITY_OPTIONS = ["Mild", "Moderate", "High"];
@@ -76,7 +76,7 @@ const DiseaseEdit = () => {
 
   if (!disease) {
     return (
-      <DashboardLayout>
+      <AdminDashboardLayout>
         <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-3xl mx-auto">
           <Link
             to="/admin/diseases"
@@ -92,25 +92,25 @@ const DiseaseEdit = () => {
             </p>
           </div>
         </div>
-      </DashboardLayout>
+      </AdminDashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
-      <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-3xl mx-auto">
-        <Link
-          to="/admin/diseases"
-          className="inline-flex items-center text-sm text-[#34AADC] hover:underline mb-6"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Manage Diseases
-        </Link>
-
-        <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-6">
+    <AdminDashboardLayout>
+      <div className="px-4 sm:px-8 lg:px-12 py-8 w-full max-w-full mx-auto">
+         <div className="flex items-center justify-between w-full mb-8 ">
+         <Link
+              to="/admin/diseases"
+              className="flex items-center text-gray-500 hover:text-[#34AADC] transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-5 w-5" />
+              <span className="font-medium">Back to managed disease</span>
+            </Link>
+        </div>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
           Edit: {disease.name}
         </h1>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -287,8 +287,8 @@ const DiseaseEdit = () => {
             </Link>
           </div>
         </form>
-      </div>
-    </DashboardLayout>
+        </div>
+    </AdminDashboardLayout>
   );
 };
 

@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import DashboardLayout from "../../components/Layout/Sections/DashboardLayout";
+import AdminDashboardLayout from "../../components/Layout/Sections/AdminDashboardLayout";
 import { useDiseases } from "../../contexts/DiseaseContext";
 
 const DiseaseDetail = () => {
@@ -24,7 +24,7 @@ const DiseaseDetail = () => {
   
   if (!disease) {
     return (
-      <DashboardLayout>
+      <AdminDashboardLayout>
         <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-5xl mx-auto">
           <Link
             to="/admin/diseases"
@@ -43,27 +43,30 @@ const DiseaseDetail = () => {
             </p>
           </div>
         </div>
-      </DashboardLayout>
+      </AdminDashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
-      <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-5xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <Link
-            to="/admin/diseases"
-            className="inline-flex items-center text-sm text-[#34AADC] hover:underline"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Link>
-          <Link
-            to={`/admin/diseases/${id}/edit`}
-            className="text-sm font-medium text-[#34AADC] hover:underline"
-          >
-            Edit
-          </Link>
+    <AdminDashboardLayout>
+      <div className="px-4 sm:px-8 lg:px-12 py-8 w-full max-w-full mx-auto">
+         <div className="flex items-center justify-between w-full mb-8">
+            <Link
+              to="/admin/diseases"
+              className="flex items-center text-gray-500 hover:text-[#34AADC] transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-5 w-5" />
+              <span className="font-medium">Back to List</span>
+            </Link>
+
+            {/* Your new Edit Button */}
+            <Link
+              to={`/admin/diseases/${id}/edit`}
+              className="inline-flex items-center px-8 py-3 bg-[#34AADC] text-white font-bold rounded-full shadow-md hover:bg-[#2898c7] transition-all"
+            >
+              Edit Information
+            </Link>
+          
         </div>
 
         <div className="rounded-[32px] bg-white p-6 md:p-10 shadow-sm border border-blue-100">
@@ -151,7 +154,7 @@ const DiseaseDetail = () => {
           </p>
         </div>
       </div>
-    </DashboardLayout>
+    </AdminDashboardLayout>
   );
 };
 

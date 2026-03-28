@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require("../models/User");
 const Article = require("../models/Article");
 const Hospital = require("../models/Hospital");
-// const Disease = require('../models/Disease');
+const Disease = require('../models/Disease');
 const Activity = require("../models/Activity");
 const Counter = require('../models/Counter');  
 const cloudinary = require('cloudinary').v2;
@@ -513,19 +513,19 @@ exports.getHospitalById = async (req, res) => {
 
 exports.getDashboardStats = async (req, res) => {
     try {
-        const [userCount, hospitalCount, articleCount] = await Promise.all([
+        const [userCount, hospitalCount, diseaseCount ,articleCount] = await Promise.all([
             User.countDocuments(),
             Hospital.countDocuments(),
-            // Disease.countDocuments(),
+            Disease.countDocuments(),
             Article.countDocuments()
         ]);
-        console.log({ userCount, hospitalCount, articleCount });
+        console.log({ userCount, hospitalCount, articleCount ,diseaseCount});
         res.status(200).json({
             success: true,
             data: {
                 users: userCount,
                 hospitals: hospitalCount,
-                // diseases: diseaseCount,
+                diseases: diseaseCount,
                 articles: articleCount
             }
         });
