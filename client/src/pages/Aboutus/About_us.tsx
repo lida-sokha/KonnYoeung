@@ -51,50 +51,131 @@ const AboutUsPage: React.FC = () => {
       </section>
 
       {/* TEAM TITLE */}
-      <section className="text-center py-12">
-        <h2 className="text-3xl font-bold text-sky-500">Meet Our Team</h2>
-      </section>
-
-      {/* ADVISOR */}
-      <section className="max-w-4xl mx-auto px-6">
-        <div className="bg-sky-400 text-white rounded-xl py-6 text-center font-semibold text-lg">
-          Ms. Kim Sokhey
-          <div className="text-sm font-normal mt-1">Project Advisor</div>
+      <section className="max-w-7xl mx-auto px-6 pt-20 pb-12">
+        <div className="flex flex-col items-center text-center">
+          {/* Main Title - Increased to 4xl for prominence */}
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+            Meet Our <span className="text-[#34AADC]">Team</span>
+          </h2>
+          
+          {/* Brand Accent Bar */}
+          <div className="h-1.5 w-20 bg-[#34AADC] mt-6 rounded-full" />
         </div>
       </section>
 
+      {/* ADVISOR */}
+     <section className="max-w-7xl mx-auto px-6">
+          <div className="bg-sky-400 rounded-[32px] py-10 text-center shadow-lg shadow-sky-100 relative overflow-hidden group">
+            
+            {/* Subtle animated background circle for a premium feel */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500" />
+            
+            <div className="relative z-10">
+              {/* Font sizes now match the team cards: text-xl for name */}
+              <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">
+                Ms. Kim Sokhey
+              </h3>
+              
+              <div className="mt-2 inline-block px-4 py-1 bg-white/20 backdrop-blur-md rounded-full border border-white/30">
+                <p className="text-white text-xs font-bold uppercase tracking-[0.2em]">
+                  Project Advisor
+                </p>
+              </div>
+            </div>
+          </div>
+      </section>
+
       {/* TEAM MEMBERS */}
-      <section className="max-w-7xl mx-auto px-6 py-16 grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <section className="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
         {[
-          { name: 'Khy Pichsreyvathanak', role: 'Data Analysis', color: 'bg-sky-400' },
-          { name: 'Phon Seaklang', role: 'Data Visualization', color: 'bg-green-400' },
-          { name: 'Chum Phalla', role: 'Data Collection', color: 'bg-red-500' },
-          { name: 'Soeun Sokchetra', role: 'Data Collection', color: 'bg-yellow-400' },
-          { name: 'Sry Kimsour', role: 'UX/UI Design', img: true },
-          { name: 'Sokha Lida', role: 'System Architecture Design', img: true }
+          {
+            name: 'Khy Pichsreyvathanak',
+            role: 'Data Scientist',
+            img: 'https://res.cloudinary.com/dprsygcvh/image/upload/v1774689115/IMG_8092_xtief8.jpg',
+            initial: 'KP'
+          },
+          {
+            name: 'Phon Seaklang',
+            role: 'Data Scientist',
+            img:'https://res.cloudinary.com/dprsygcvh/image/upload/v1774689215/DSC_2852_copy_gybmcc.jpg',
+            initial: 'PS'
+          },
+          {
+            name: 'Chum Phalla',
+            role: 'Data Scientist',
+            img: 'https://res.cloudinary.com/dprsygcvh/image/upload/v1774688908/phalla_qautmn.png',
+            initial: 'CP'
+          },
+          {
+            name: 'Soeun Sokchetra',
+            role: 'Data Scientist',
+            img: 'https://res.cloudinary.com/dprsygcvh/image/upload/v1774689204/photo_2026-03-28_16-13-11_bvbecv.jpg',
+            initial: 'SS'
+            
+           },
+          {
+            name: 'Sry Kimsour',
+            role: 'Frontend Developer',
+            img: 'https://res.cloudinary.com/dprsygcvh/image/upload/v1774689371/photo_2026-03-28_16-16-00_depcqx.jpg',
+            initial: 'SK'
+          },
+          { 
+            name: 'Sokha Lida', 
+            role: 'Backend Developer', 
+            img: "https://res.cloudinary.com/dprsygcvh/image/upload/c_thumb,g_face,w_1000,h_1000,f_auto/v1774583605/lida_rmiypq.jpg", 
+            initial: 'SL',
+            facebook:null,
+            linkedin:'https://www.linkedin.com/in/sokha-lida-aa97552b9/'
+          }
         ].map((member, index) => (
           <div
             key={index}
-            className="border-2 border-sky-400 rounded-xl p-6 text-center"
+            className="group bg-white rounded-[32px] p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-blue-200"
           >
-            {member.img ? (
-              <img
-                src="https://via.placeholder.com/80"
-                alt={member.name}
-                className="w-20 h-20 rounded-full mx-auto mb-4"
-              />
-            ) : (
-              <div
-                className={`w-20 h-20 rounded-full mx-auto mb-4 ${member.color}`}
-              />
-            )}
+            {/* Avatar Container */}
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              {/* Soft decorative glow behind the avatar */}
+              <div className={`absolute inset-0 rounded-3xl blur-lg opacity-20 transition-opacity group-hover:opacity-40`} />
+              
+              {member.img ? (
+                <img
+                  src={typeof member.img === 'string' ? member.img : "https://via.placeholder.com/150"}
+                  alt={member.name}
+                  className="relative w-full h-full rounded-3xl object-cover shadow-md border-2 border-white"
+                />
+              ) : (
+                <div className={`relative w-full h-full rounded-3xl flex items-center justify-center text-white text-xl font-bold shadow-md`}>
+                  {member.initial}
+                </div>
+              )}
+            </div>
 
-            <h3 className="font-semibold">{member.name}</h3>
-            <p className="text-sky-500 text-sm mt-1">{member.role}</p>
+            {/* Name and Role */}
+            <h3 className="text-xl font-bold text-gray-900 group-hover:text-[#34AADC] transition-colors">
+              {member.name}
+            </h3>
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-2">
+              {member.role}
+            </p>
 
-            <div className="flex justify-center gap-4 mt-3 text-gray-500">
-              <FaFacebook className="w-6 h-6 text-sky-500 hover:text-sky-700 cursor-pointer "/>
-              <FaLinkedin className="w-6 h-6 text-sky-500 hover:text-sky-700 cursor-pointer "/>
+            {/* Social Links - Cleaned up */}
+            <div className="flex justify-center gap-4 mt-8 pt-6 border-t border-gray-50">
+              <a 
+                href={member.facebook!} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-gray-50 text-[#34AADC] hover:bg-[#34AADC] hover:text-white transition-all duration-300 shadow-sm"
+              >
+                <FaFacebook size={20} />
+              </a>
+              <a 
+                href={member.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-gray-50 text-[#34AADC] hover:bg-[#34AADC] hover:text-white transition-all duration-300 shadow-sm"
+              >
+                <FaLinkedin size={20} />
+              </a>
             </div>
           </div>
         ))}

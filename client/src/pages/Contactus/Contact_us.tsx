@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 interface FormData {
   name: string;
   email: string;
@@ -59,12 +60,16 @@ const ContactUsPage: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
+  // We use a "Promise" toast for a better UX while the user waits
+  const submitPromise = new Promise((resolve, reject) => {
     setTimeout(() => {
-      alert('Thank you for your message! We will get back to you soon.');
+      // Simulate success
+      resolve("Success");
+      
       setFormData({
         name: '',
         email: '',
@@ -73,8 +78,28 @@ const ContactUsPage: React.FC = () => {
         message: '',
       });
       setIsSubmitting(false);
-    }, 1000);
-  };
+    }, 1500);
+  });
+
+  toast.promise(submitPromise, {
+    loading: 'Sending your message...',
+    success: <b>Message sent! We'll review it.</b>,
+    error: <b>Could not send message. Please try again.</b>,
+  }, {
+    style: {
+      borderRadius: '16px', // Matches your KonnYoeung rounded UI
+      background: '#333',
+      color: '#fff',
+    },
+    success: {
+      duration: 5000,
+      iconTheme: {
+        primary: '#34dc4a', // Your brand blue
+        secondary: '#fff',
+      },
+    },
+  });
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -111,14 +136,14 @@ const ContactUsPage: React.FC = () => {
             <ContactCard
               icon={<Phone size={24} />}
               title="Call Us"
-              content="+855 23 XXX XXX"
+              content="+855 61 753 730"
               subContent="Monday - Friday: 8:00 AM - 5:00 PM"
             />
 
             <ContactCard
               icon={<MapPin size={24} />}
               title="Visit Us"
-              content="Street XXX, Sangkat XXX"
+              content="Street 302, Sangkat Boeung Keng Kang I"
               subContent="Khan Chamkarmon, Phnom Penh, Kingdom of Cambodia"
             />
 

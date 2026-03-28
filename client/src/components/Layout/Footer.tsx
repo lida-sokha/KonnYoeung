@@ -24,9 +24,9 @@ const Footer = () => {
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <nav className="flex flex-col space-y-2">
               <a href="/" className="text-white/90 hover:text-white transition-colors text-sm">Home</a>
-              <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">Feature</a>
-              <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">About Us</a>
-              <a href="#" className="text-white/90 hover:text-white transition-colors text-sm">Contact Us</a>
+              <a href="/#features-section" className="text-white/90 hover:text-white transition-colors text-sm">Feature</a>
+              <a href="/about" className="text-white/90 hover:text-white transition-colors text-sm">About Us</a>
+              <a href="/contact" className="text-white/90 hover:text-white transition-colors text-sm">Contact Us</a>
             </nav>
           </div>
 
@@ -44,7 +44,7 @@ const Footer = () => {
                 <div className="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center group-hover:bg-white/20 transition-colors">
                   <Phone className="w-6 h-6" />
                 </div>
-                <span className="text-sm">+855 XX XXX XXXX</span>
+                <span className="text-sm">+855 61 753 730</span>
               </a>
 
               <div className="flex gap-3 pt-2">
