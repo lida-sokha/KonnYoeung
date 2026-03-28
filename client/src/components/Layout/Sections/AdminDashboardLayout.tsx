@@ -19,6 +19,7 @@ return (
       <div className={`
         fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out
         md:relative md:translate-x-0 md:h-screen md:sticky md:top-0
+        w-64 shrink-0 /* ADD THESE: Fixed width and prevent shrinking */
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <Adminsidebar />
@@ -33,7 +34,7 @@ return (
       )}
 
       {/* 4. The Main Area: Adjust margins for mobile */}
-      <main className="flex-1 bg-white my-2 mx-2 md:my-4 md:mr-4 md:ml-0 rounded-[30px] md:rounded-[40px] p-6 md:p-10 shadow-lg h-fit min-h-[calc(100vh-16px)] md:min-h-[calc(100vh-32px)]">
+      <main className="flex-1 min-w-0 bg-white my-2 mx-2 rounded-[30px] md:rounded-[40px] ..."> 
         {children}
       </main>
       

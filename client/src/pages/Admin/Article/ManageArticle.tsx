@@ -35,7 +35,6 @@ const ManageArticle = () => {
   const fetchArticles = async () => {
   try {
     const response = await API.get("/admin/articles");
-    console.log("Raw Data from Backend:", response.data.data);
     
     if (response.data.success) {
       setArticles(response.data.data);
@@ -107,13 +106,11 @@ const executeDelete = async (id: string) => {
 
   return (
     <AdminDashboardLayout>
-      <div className="px-8 py-6">
+      <div className="px-4 sm:px-6 lg:px-10 py-10 max-w-6xl mx-auto">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
+        <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Manage Articles</h1>
-            <p className="text-gray-500 text-m">Create, edit, and manage your content</p>
-          </div>
           <button
             onClick={() => navigate("/admin/createArticle")}
             className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-green-700 transition shadow-md"
@@ -121,10 +118,12 @@ const executeDelete = async (id: string) => {
             <Plus size={20} />
             Create Article
           </button>
+          </div>
+          <p className="text-gray-500 text-m">Create, Edite and Delete the article</p>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-3">
+        <div className="bg-white p-3 sm:p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-3">
           <Search className="text-gray-400" size={20} />
           <input
             type="text"
@@ -136,8 +135,9 @@ const executeDelete = async (id: string) => {
         </div>
 
         {/* Table Section */}
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-          <table className="w-full text-left">
+       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto w-full">
+          <table className="w-full text-left min-w-[800px]">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="px-6 py-4 text-sm font-semibold text-gray-600">Article Title</th>
@@ -196,7 +196,8 @@ const executeDelete = async (id: string) => {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+          </div>
       </div>
     </AdminDashboardLayout>
   );

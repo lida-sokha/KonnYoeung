@@ -85,12 +85,10 @@ const handleDelete = async (hospitalId: string) => {
     };
     return (
         <AdminDashboardLayout>
-            <div className="p-6">
-                <div className="flex justify-between items-center mb-8">
-                    <div>
+            <div className="px-4 sm:px-6 lg:px-10 py-10 max-w-6xl mx-auto">
+                <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                         <h1 className="text-3xl font-bold text-gray-900">Manage Hospitals</h1>
-                        <p className="text-gray-500 text-m">Add and manage hospital information</p>
-                    </div>
                     <button
                         onClick={() => navigate("/admin/Addhospital")}
                         className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-green-700 transition shadow-md"
@@ -98,6 +96,8 @@ const handleDelete = async (hospitalId: string) => {
                         <Plus size={20} />
                         Add Hospital
                     </button>
+                    </div>
+                        <p className="text-gray-500 text-m">Add and manage hospital information</p>
                 </div>
 
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex items-center gap-3">

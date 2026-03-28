@@ -75,7 +75,7 @@ const formatTimeAgo = (dateInput: string | Date) => {
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8">
+        <header className="mb-8 mt-10">
           <h1 className="text-3xl font-bold text-gray-800">Welcome, Parent!</h1>
           <p className="text-gray-500">Here's your health overview and recommendations</p>
         </header>

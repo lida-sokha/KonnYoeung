@@ -89,7 +89,7 @@ const ManageUsers = () => {
 
   return (
     <AdminDashboardLayout>
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="px-4 sm:px-6 lg:px-10 py-20 max-w-6xl mx-auto">
         
         {/* Header Section: Stacked on mobile, side-by-side on md+ */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">

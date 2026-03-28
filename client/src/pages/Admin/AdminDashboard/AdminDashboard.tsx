@@ -93,7 +93,7 @@ const AdminDashboard = () => {
 
     return (
         <AdminDashboardLayout>
-            <div className="max-w-7xl mx-auto p-6">
+            <div className="max-w-7xl mx-auto p-6 mt-10">
                 <header className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Dashboard Overview</h1>
                 </header>

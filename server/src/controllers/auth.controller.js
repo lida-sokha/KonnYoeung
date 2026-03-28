@@ -34,11 +34,20 @@ exports.signup = async (req, res) => {
     );
 
     // 4. Send the Email
-    await sendEmail(
-      email,
-      "Verify your KonnYoeung Account",
-      `Your verification code is: ${otp}. It expires in 10 minutes.`
-    );
+    await sendEmail({
+      email: email,
+      subject: "Verify your KonnYoeung Account",
+      text: `Your verification code is: ${otp}. It expires in 10 minutes.`,
+      // Optional: add html if you want it to look pretty
+      html: `
+        <div style="font-family: sans-serif; border: 1px solid #e2e8f0; padding: 20px; border-radius: 10px;">
+          <h2 style="color: #34AADC;">Verify your KonnYoeung Account</h2>
+          <p>Your verification code is:</p>
+          <h1 style="letter-spacing: 5px; color: #1e293b;">${otp}</h1>
+          <p style="font-size: 12px; color: #64748b;">This code expires in 10 minutes.</p>
+        </div>
+      `
+    });
 
     res.status(200).json({
       success: true,

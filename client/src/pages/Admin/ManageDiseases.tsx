@@ -8,7 +8,7 @@ const ManageDiseases = () => {
 
   return (
     <AdminDashboardLayout>
-      <div className="px-4 sm:px-6 lg:px-10 py-6 max-w-6xl mx-auto">
+      <div className="px-4 sm:px-6 lg:px-10 py-20 max-w-6xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">
             Manage Diseases
