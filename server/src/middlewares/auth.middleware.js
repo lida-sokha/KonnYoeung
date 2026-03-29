@@ -12,7 +12,7 @@ const protect = async (req, res, next) => {
     try {
         const secret = process.env.JWT_SECRET || "temp_secret";
         const decoded = jwt.verify(token, secret);
-        req.user = decoded;
+        req.user = { id: decoded.id || decoded._id };
         next();
     } catch (err) {
         res.status(401).json({ message: "Invalid token" });

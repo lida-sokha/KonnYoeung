@@ -52,7 +52,7 @@ function AppContent() {
       <Route path="/signup" element={<SignUp />} />
       <Route path="/verify" element={<Verify />} />
 
-      <Route path='/Dashboard' element={
+      <Route path='/dashboard' element={
         <ProtectedRoute>
           <DashboardPage />
         </ProtectedRoute>
