@@ -39,10 +39,14 @@ export default function Login() {
         password: formData.password
       });
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        const userRole = response.data.user.role;
-        navigate(userRole === "admin" ? "/admin/dashboard" : "/dashboard", { replace: true });
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+          
+          const userRole = response.data.user.role;
+          const target = userRole === "admin" ? "/admin/dashboard" : "/dashboard";
+          
+          // This works on ALL phones because it forces a fresh start
+          window.location.href = target; 
       }
     } catch (err: any) {
       // Avoid leaking specific server details; use generic but helpful messages
