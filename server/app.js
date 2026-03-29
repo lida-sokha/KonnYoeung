@@ -14,10 +14,10 @@ const app = express();
 app.use(cookieParser());
 
 const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:5500",
-  "http://127.0.0.1:5500"
+  process.env.FRONTEND_URL, // This reads from your .env file
+  "https://konn-yoeung-three.vercel.app",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173"
 ];
 
 app.use(cors({
@@ -56,10 +56,10 @@ mongoose.connect(process.env.MONGODB_URI)
     app.use("/api/admin",adminRoutes);
 
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-      console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-    });
+    app.listen(PORT, "0.0.0.0", () => { // Adding "0.0.0.0" helps Vultr listen correctly
+  console.log(`Server running on https://konnyoeung.duckdns.org`);
+  console.log(`Swagger Docs: https://konnyoeung.duckdns.org/api-docs`);
+  });
   })
   .catch(err => {
     console.error("❌ MongoDB connection failed:", err.message);
