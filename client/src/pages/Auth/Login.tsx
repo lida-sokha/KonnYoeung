@@ -44,9 +44,7 @@ export default function Login() {
           
           const userRole = response.data.user.role;
           const target = userRole === "admin" ? "/admin/dashboard" : "/dashboard";
-          
-          // This works on ALL phones because it forces a fresh start
-          window.location.href = target; 
+          window.location.href = target;
       }
     } catch (err: any) {
       // Avoid leaking specific server details; use generic but helpful messages
