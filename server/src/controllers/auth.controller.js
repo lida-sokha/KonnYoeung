@@ -85,11 +85,11 @@ exports.login = async (req, res) => {
         { expiresIn: "1d" }
       );
       res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Lax",
-        maxAge: 24 * 60 * 60 * 1000
-      });
+      httpOnly: true,
+      secure: true, 
+      sameSite: "None", 
+      maxAge: 24 * 60 * 60 * 1000
+    });
 
       return res.status(200).json({
         success: true,
@@ -128,8 +128,8 @@ exports.verifyOtp = async (req, res) => {
 
     // 5. NOW generate the Token and Cookie
     const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET || "temp_secret",
+      { id: user._id, role: user.role }, 
+      process.env.JWT_SECRET, 
       { expiresIn: "1d" }
     );
 
@@ -248,7 +248,7 @@ exports.resendOtp = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otp = newotp;
+    user.otp = newOtp;
     user.otpExpires = Date.now() + 10 * 60 * 1000;
     await user.save();
 
