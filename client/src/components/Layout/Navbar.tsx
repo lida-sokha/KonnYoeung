@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
 
         <div className="flex items-center gap-2 md:gap-4">
           
-          <div className="relative" ref={dropdownRef}>
+          {/* <div className="relative" ref={dropdownRef}>
             <div 
               onClick={() => setIsLangOpen(!isLangOpen)}
               className={`border border-gray-300 px-3 md:px-4 py-1 flex items-center gap-1 md:gap-2 cursor-pointer rounded-full transition-all duration-200 hover:border-[#33A6DC] ${isLangOpen ? 'border-[#33A6DC] bg-blue-50/50' : ''}`}
@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
                 <div onClick={() => { setLanguage('KH'); setIsLangOpen(false); closeMenu(); }} className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-sm">ភាសាខ្មែរ</div>
               </div>
             )}
-          </div>
+          </div> */}
           
           <Link to="/login" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
             <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
